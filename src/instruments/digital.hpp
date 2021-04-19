@@ -4,15 +4,16 @@
 
 
 template <typename T=double>
-class DigitalOption: public VanillaOption<T> {
+class DigitalOption: public Option<T> {
 
     public:
         virtual~DigitalOption() = default;
-        DigitalOption(double maturity, T strike, const OptionType& type):VanillaOption<T>(maturity, strike, type){};
+        DigitalOption(double maturity, T strike, const OptionType& type):
+            Option<T>(maturity, strike, type, "Digital Option"){};
 
         T payoff(T price) const override
         {
-            return Option<T>::type_ * (price - VanillaOption<T>::strike_) > 0.0;
+            return this->type_ * (price - this->strike_) > 0.0;
         }
 };
 

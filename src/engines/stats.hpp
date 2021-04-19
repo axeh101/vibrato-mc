@@ -3,12 +3,6 @@
 
 using namespace std;
 
-/*! \class Statistics
- *  \brief Computes the sample statistics of a random variable
- *
- *  Computes the sample statistics for  multithreading support for Monte Carlo simulation
- *  It can be suited for other multi threaded objectives
- */
 class Statistics
 {
 public:

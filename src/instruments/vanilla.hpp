@@ -8,17 +8,12 @@ class VanillaOption: public Option<T>
     public:
         virtual~VanillaOption() = default;
         VanillaOption(double maturity, T strike, const OptionType& type):
-            Option<T>(maturity, type), strike_(strike){};
+            Option<T>(maturity, strike, type, "Vanilla Option"){};
 
         T payoff(T price) const override
         {
-            return std::max(Option<T>::type_ * (price - strike_), 0.0);
+            return std::max(this->type_ * (price - this->strike_), 0.0);
         };
-
-        T strike() const { return strike_; };
-
-    protected:
-        T strike_;
 
 };
 

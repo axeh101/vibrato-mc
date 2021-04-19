@@ -11,4 +11,5 @@ class Generator{
         virtual T operator()() = 0;  
 };
 
+
 #endif

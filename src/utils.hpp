@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include "processes/helper.hpp"
 
 using namespace std;
 
@@ -11,18 +11,17 @@ inline unsigned p2(unsigned n) { unsigned u=1; return u<<=n;}
 
 
 template<typename T>
-void vect2csv(std::string name, std::vector<T>& v){
-    std::cout << " Writing to file " << endl;
+void vect2csv(std::string name, Path<T>& v){
+    std::cout << "Writing to file " << endl;
     ofstream myfile (name + ".csv");
     if (myfile.is_open())
     {
         for (auto i:v)
         {
-                        
             myfile << i << endl;
         }
         myfile.close();
-    std::cout << " Writing to file.....Done! " << endl;
+    std::cout << "Writing to file.....Done! " << endl;
     }
     else
     {
