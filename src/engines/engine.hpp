@@ -45,7 +45,7 @@ class PricingEngine {
         T rho() const { return rho_; }
         T vega() const { return vega_; }
         T delta() const { return delta_; }
-        T gamma() const { return gamma; }
+        T gamma() const { return gamma_; }
         T theta() const { return theta_; }
         T vanna() const {return vanna_;}
         T volga() const {return volga_;}
