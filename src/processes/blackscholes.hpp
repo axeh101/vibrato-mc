@@ -15,13 +15,11 @@ class BlackScholesProcess : public Process<T>
         virtual T drift() const {return rate_ * this->currentState_.value;};
         virtual T diffusion() const {return vol_ * this->currentState_.value ;};
 
-        virtual State<T> nextState(double t) {
-            assert(t > this->currentState_.time);
-            double dt = (t-this->currentState_.time);
-            T  currentValue =  this->currentState_.value;
-            T dwt = sqrt(dt) * this->N_();
-            T newValue = currentValue * exp( (rate_ - 0.5 * vol_ * vol_) * dt + vol_* dwt);
-            return {t, newValue};
+        virtual State<T> nextIto(double h) {
+            return {
+                this->currentState_.time + h, 
+                ito(this->currentState_.value, h)
+            };
         }
 
         virtual T vol() const {return vol_;}
@@ -34,9 +32,31 @@ class BlackScholesProcess : public Process<T>
                 "Volatility: "<< vol_ << std::endl;
         };
 
+        virtual State<T> moveIto(double t) {
+            this->currentState_ = nextIto(t);
+            return this->currentState_;
+        }
+
+        virtual Path<T> generatePath(int nsamples, double horizon) {
+            Path<T> path = Path<T>(nsamples+1);
+            path[0] = this->initialState_;
+            double h = horizon / nsamples;
+            for (int i = 1; i <= nsamples; i++) {
+                path[i] = this->moveIto(h);
+            }
+            return path;
+        }
     private:
         T rate_;
         T vol_;
+
+        T ito(T value, double h) {
+            T vol2= vol_ * vol_;
+            T dWt = sqrt(h) * this->N_(); 
+            T newValue = value * exp( (rate_ - 0.5 * vol2) * h + vol_* dWt);
+            return newValue;
+        }
+
 };
 
 #endif  // BLACKSCHOLES_HPP

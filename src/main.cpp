@@ -42,10 +42,11 @@ int main(void)
     std::cout << bs.eulerPriceDiff(.1) << std::endl;
     std::cout << bs.eulerPriceDiff(.3) << std::endl;
     std::cout << bs.eulerPriceDiff(.5) << std::endl;
-    Path<double> path = bs.generatePath(100, 1);
+    Path<double> path = bs.generatePath(1000, 1);
+    bs.resetState();
     vect2csv("python/datasets/bspath", path);
 
-    Path<double> path2 = bs.eulerDiscretization(100, 1);
+    Path<double> path2 = bs.eulerDiscretization(1000, 1);
     vect2csv("python/datasets/bseulerpath", path2);
     std::cout << "*****************************" << std::endl;
     std::cout << bs << std::endl;
