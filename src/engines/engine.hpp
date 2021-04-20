@@ -13,41 +13,34 @@ class PricingEngine {
         Option<T>& option_;
         TProcess& process_;
 
-        T delta_;
-        T gamma_;
-        T vega_;
-        T theta_;
-        T rho_;
-        T vanna_;
-        T volga_;
-        T premium_;
 
     public:
         PricingEngine(Option<T>& option, TProcess& process)
             :option_(option), process_(process){};
         virtual~PricingEngine() = default;
-        virtual void calculate() = 0;
+
         friend std::ostream & operator<<(std::ostream & o, const PricingEngine<T, TProcess>& engine)  {
             return engine.displayResults(o);
         }
         virtual std::ostream & displayResults(std::ostream& o) const {
             return o << option_ <<std::endl << process_ << std::endl <<
-                "Premium: " << premium_ << std::endl <<
-                "Delta: " << delta_ << std::endl <<
-                "Gamma: " << gamma_ << std::endl <<
-                "Vega: " << vega_ << std::endl <<
-                "Vanna: " << vanna_ << std::endl <<
-                "Volga: " << volga_ << std::endl <<
-                "Rho: " << rho_<< std::endl <<
-                "Theta: " << theta_ << std::endl;
+                "Premium: " << this->premium() << std::endl <<
+                "Delta: " << this->delta() << std::endl <<
+                "Gamma: " << this->gamma() << std::endl <<
+                "Vega: " << this->vega() << std::endl <<
+                "Vanna: " << this->vanna() << std::endl <<
+                "Volga: " << this->volga() << std::endl <<
+                "Rho: " << this->rho() << std::endl <<
+                "Theta: " << this->theta() << std::endl;
         };
 
-        T rho() const { return rho_; }
-        T vega() const { return vega_; }
-        T delta() const { return delta_; }
-        T gamma() const { return gamma_; }
-        T theta() const { return theta_; }
-        T vanna() const {return vanna_;}
-        T volga() const {return volga_;}
+        virtual T rho() const = 0;
+        virtual T vega() const = 0;
+        virtual T delta() const = 0;
+        virtual T gamma() const = 0;
+        virtual T theta() const = 0;
+        virtual T vanna() const = 0;
+        virtual T volga() const = 0;
+        virtual T premium() const = 0;
 };
 #endif  // ENGINE_HPP

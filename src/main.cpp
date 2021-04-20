@@ -18,12 +18,14 @@ int main(void)
 
     // Analytical formulation for an European Option
     //
-    OptionType type = OptionType::Call;
+
     double maturity = .5;
     double strike = 100;
-    VanillaOption<double> callVanilla(maturity, strike, type);
-    DigitalOption<double> callDigital(maturity, strike, type);
+    VanillaOption<double> callVanilla(maturity, strike, OptionType::Call);
+    VanillaOption<double> putVanilla(maturity, strike, OptionType::Put);
+    DigitalOption<double> callDigital(maturity, strike, OptionType::Call);
     cout << callVanilla << endl;
+    cout << putVanilla << endl;
     cout << callDigital << endl;
 
     std::cout << "*****************************" << std::endl;
@@ -31,9 +33,10 @@ int main(void)
     double rate= .02;
     double vol = .03;
     BlackScholesProcess<double> bs(initial_state, rate, vol);
-    AnalyticalBS<double> bsEngine = AnalyticalBS<double>(callVanilla, bs);
-    bsEngine.calculate();
-    std::cout << bsEngine << std::endl;
+    AnalyticalBS<double> bsEngineCall = AnalyticalBS<double>(callVanilla, bs);
+    AnalyticalBS<double> bsEnginePut = AnalyticalBS<double>(putVanilla, bs);
+    std::cout << bsEngineCall << std::endl;
+    std::cout << bsEnginePut << std::endl;
 
     std::cout << "*****************************" << std::endl;
     Path<double> path = bs.generatePath(100, 1);
