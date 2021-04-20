@@ -4,14 +4,13 @@
 #include <cmath>
 #include "engine.hpp"
 #include "../random/normal.hpp"
+#include "../processes/blackscholes.hpp"
 
 template <typename T>
-class AnalyticalBS: public PricingEngine<T>
+class AnalyticalBS: public PricingEngine<T, BlackScholesProcess<T>>
 {
-    private:
-
     public:
-        AnalyticalBS(Option<T>& option, Process<T>& process): PricingEngine<T>(option, process){};
+        AnalyticalBS(Option<T>& option, BlackScholesProcess<T>& process): PricingEngine<T, BlackScholesProcess<T>>(option, process){};
         virtual~AnalyticalBS() = default;
 
         virtual void calculate()  override {

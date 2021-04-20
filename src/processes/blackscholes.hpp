@@ -9,7 +9,7 @@ class BlackScholesProcess : public Process<T>
 {
 
     public:
-        BlackScholesProcess(State<T> initialState, T vol, T rate):
+        BlackScholesProcess(State<T> initialState, T rate , T vol):
             Process<T>(initialState, "Black Scholes"),rate_(rate), vol_(vol), normal_(NormalDistribution<T>(0,1)){};
 
         virtual T drift() const {return rate_ * this->currentState_.value;};
@@ -32,6 +32,16 @@ class BlackScholesProcess : public Process<T>
             }
             return path;
         }
+        virtual T vol() const {return vol_;}
+        virtual T rate() const {return rate_;}
+
+        virtual std::ostream & describe(std::ostream & o) const
+        {
+            return  Process<T>::describe(o)  <<
+                "Rate: " << rate_ << std::endl <<
+                "Volatility: "<< vol_ << std::endl;
+        };
+
     private:
         T rate_;
         T vol_;

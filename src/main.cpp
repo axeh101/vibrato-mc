@@ -26,19 +26,22 @@ int main(void)
     cout << callVanilla << endl;
     cout << callDigital << endl;
 
+    std::cout << "*****************************" << std::endl;
     State<double> initial_state = {0.0, 100};
-    double drift = .02;
-    double diffusion = .03;
-    BlackScholesProcess<double> bs(initial_state, drift, diffusion);
+    double rate= .02;
+    double vol = .03;
+    BlackScholesProcess<double> bs(initial_state, rate, vol);
+    AnalyticalBS<double> bsEngine = AnalyticalBS<double>(callVanilla, bs);
+    bsEngine.calculate();
+    std::cout << bsEngine << std::endl;
 
+    std::cout << "*****************************" << std::endl;
     Path<double> path = bs.generatePath(100, 1);
     vect2csv("python/datasets/bspath", path);
 
-    AnalyticalBS<double> bsEngine = AnalyticalBS<double>(callVanilla, bs);
+    std::cout << "*****************************" << std::endl;
+    std::cout << bs << std::endl;
 
-    bsEngine.calculate();
-
-    std::cout << bsEngine << std::endl;
 
 
 

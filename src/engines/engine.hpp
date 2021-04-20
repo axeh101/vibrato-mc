@@ -6,12 +6,12 @@
 #include "../instruments/option.hpp"
 #include "../processes/process.hpp"
 
-template <typename T>
+template <typename T, class TProcess>
 class PricingEngine {
 
     protected:
         Option<T>& option_;
-        Process<T>& process_;
+        TProcess& process_;
 
         T delta_;
         T gamma_;
@@ -23,11 +23,11 @@ class PricingEngine {
         T premium_;
 
     public:
-        PricingEngine(Option<T>& option, Process<T>& process)
+        PricingEngine(Option<T>& option, TProcess& process)
             :option_(option), process_(process){};
         virtual~PricingEngine() = default;
         virtual void calculate() = 0;
-        friend std::ostream & operator<<(std::ostream & o, const PricingEngine<T>& engine)  {
+        friend std::ostream & operator<<(std::ostream & o, const PricingEngine<T, TProcess>& engine)  {
             return engine.displayResults(o);
         }
         virtual std::ostream & displayResults(std::ostream& o) const {
