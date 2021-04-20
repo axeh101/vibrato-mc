@@ -15,7 +15,7 @@
 
 // Engines
 #include "engines/montecarlo.hpp"
-#include "engines/analytic.hpp"
+#include "engines/analytic_bs.hpp"
 #include "engines/vibrato.hpp"
 #include "engines/vibratoad.hpp"
 
