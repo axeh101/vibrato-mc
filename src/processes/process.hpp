@@ -51,33 +51,33 @@ public:
 
 	virtual State<T> nextPriceEuler(double h, T Wh) {
 		return {
-			this->priceState_.time + h,
-			this->priceState_.value + eulerPriceDiff(h, Wh),
+			priceState_.time + h,
+			priceState_.value + eulerPriceDiff(h, Wh),
 		};
 	}
 
 	virtual State<T> movePriceEuler(double h, T Wh) {
-		priceState_ = nextPriceEuler(h, Wh);
-		return priceState_;
+		this->priceState_ = this->nextPriceEuler(h, Wh);
+		return this->priceState_;
 	}
 
 	virtual State<T> nextTangentEuler(double h, T Wh) {
 		return {
-			this->tangentState_.time + h,
-			this->tangentState_.value + eulerTangentDiff(h, Wh),
+			tangentState_.time + h,
+			tangentState_.value + eulerTangentDiff(h, Wh),
 		};
 	}
 
 	virtual State<T> nextTangent2Euler(double h, T Wh) {
 		return {
-			this->tangentState2_.time + h,
-			this->tangentState2_.value + eulerTangent2Diff(h, Wh),
+			tangentState2_.time + h,
+			tangentState2_.value + eulerTangent2Diff(h, Wh),
 		};
 	}
 
 	virtual State<T> moveTangentEuler(double h, T Wh) {
-		priceState_ = nextTangentEuler(h, Wh);
-		return priceState_;
+		tangentState_ = nextTangentEuler(h, Wh);
+		return tangentState_;
 	}
 
 	virtual void resetState() {

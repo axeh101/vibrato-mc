@@ -45,6 +45,7 @@ public:
 		};
 	}
 
+
 	virtual T vol(double t) const {
 		// Constant volatility we keep the parameter
 		//for homogeneity with stochastic volatility models

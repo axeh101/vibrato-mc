@@ -23,13 +23,13 @@ int main() {
 	VibratoBS<double> vbsEnginePut = VibratoBS<double>(putVanilla, bs, 1000, 1000, 100);
 
 	double startingPrice = 90;
-	Path<double> deltasCall(200);
-	Path<double> deltasPut(200);
-	Path<double> deltasVCall(200);
-	Path<double> deltasVPut(200);
+	Path<double> deltasCall(201);
+	Path<double> deltasPut(201);
+	Path<double> deltasVCall(201);
+	Path<double> deltasVPut(201);
 	double price = startingPrice;
 
-	for (int i = 0; i < 200; ++i) {
+	for (int i = 0; i < 201; ++i) {
 		bs.initialState.value = price;
 	    bsEngineCall.calculate();
 	    bsEnginePut.calculate();
