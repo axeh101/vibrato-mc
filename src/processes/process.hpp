@@ -6,17 +6,14 @@
 
 template<typename T>
 class Process {
-protected:
-	State<T> initialState_;
-	State<T> priceState_;
-	State<T> tangentState_;
-	State<T> tangentState2_;
-	std::string name_;
 
 public:
+	State<T> initialState;
+
 	virtual ~Process() = default;
 	Process(State<T> &initialState, std::string name) :
-			initialState_(initialState), priceState_(initialState), name_(name) {};
+			initialState(initialState), priceState_(initialState), name_(name) {
+	}
 
 	virtual T drift() const = 0;
 	virtual T diffusion() const = 0;
@@ -43,7 +40,7 @@ public:
 		NormalDistribution<T> N = NormalDistribution<T>(0, 1);
 		resetState();
 		Path<T> path = Path<T>(nsamples + 1);
-		path[0] = this->initialState_;
+		path[0] = initialState;
 		double h = horizon / nsamples;
 		for (int i = 1; i <= nsamples; ++i) {
 			path[i] = movePriceEuler(h, N());
@@ -83,16 +80,11 @@ public:
 		return priceState_;
 	}
 
-
 	virtual void resetState() {
-		priceState_ = initialState_;
+		priceState_ = initialState;
 	}
 
 
-
-	virtual State<T> initialState() {
-		return initialState_;
-	}
 
 	virtual State<T> priceState() {
 		return priceState_;
@@ -102,8 +94,12 @@ public:
 		return tangentState_;
 	}
 
-	virtual void initTangentState(T value) { tangentState_={initialState_.time, value};}
-	virtual void initTangent2State(T value) { tangentState2_={initialState_.time, value};}
+	virtual void initTangentState(T value) {
+		tangentState_ = { initialState.time, value };
+	}
+	virtual void initTangent2State(T value) {
+		tangentState2_ = { initialState.time, value };
+	}
 
 	friend std::ostream& operator<<(std::ostream &o, const Process<T> &opt) {
 		return opt.describe(o);
@@ -111,10 +107,22 @@ public:
 
 	virtual std::ostream& describe(std::ostream &o) const {
 		return o << "Process name: " << name_ << std::endl << "Initial State: "
-				<< initialState_ << std::endl << "Price State: " << priceState_
+				<< initialState << std::endl << "Price State: " << priceState_
 				<< std::endl << "Tangent State: " << tangentState_ << std::endl;
 
 	}
+
+	virtual T vol(double t) const =0;
+	virtual T rate() const = 0;
+
+
+	protected:
+		T rate_;
+		T vol_;
+		State<T> priceState_;
+		State<T> tangentState_;
+		State<T> tangentState2_;
+		std::string name_;
 };
 
 #endif  // PROCESS_HPP

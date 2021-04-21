@@ -4,5 +4,11 @@
 #include "process.hpp"
 #include "../random/normal.hpp"
 
+template <typename D>
+class HestonProcess: public Process<D>
+{
+
+};
+
 
 #endif  // HESTON_HPP

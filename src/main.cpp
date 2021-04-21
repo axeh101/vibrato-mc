@@ -11,9 +11,9 @@ int main(void)
     // Normal distributions tests
     //
      NormalDistribution<> normal = NormalDistribution<>(0, 1);
-     std::cout << normal.cdf(0) << std::endl;
-     std::cout << normal.pdf(0) << std::endl;
-     std::vector<double> v =  normal.generate(10000);
+     cout << normal.cdf(0) << endl;
+     cout << normal.pdf(0) << endl;
+     vector<double> v =  normal.generate(10000);
 
     // Analytical formulation for an European Option
     //
@@ -27,27 +27,29 @@ int main(void)
     cout << putVanilla << endl;
     cout << callDigital << endl;
 
-    std::cout << "*****************************" << std::endl;
+    cout << "*****************************" << endl;
     State<double> initial_state = {0.0, 100};
     double rate= .02;
     double vol = .03;
     BlackScholesProcess<double> bs(initial_state, rate, vol);
     AnalyticalBS<double> bsEngineCall = AnalyticalBS<double>(callVanilla, bs);
     AnalyticalBS<double> bsEnginePut = AnalyticalBS<double>(putVanilla, bs);
-    std::cout << bsEngineCall << std::endl;
-    std::cout << bsEnginePut << std::endl;
+    bsEngineCall.calculate();
+    bsEnginePut.calculate();
+    cout << bsEngineCall << endl;
+    cout << bsEnginePut << endl;
 
-    std::cout << "*****************************" << std::endl;
-    std::cout << bs.eulerPriceDiff(.1) << std::endl;
-    std::cout << bs.eulerPriceDiff(.3) << std::endl;
-    std::cout << bs.eulerPriceDiff(.5) << std::endl;
+    cout << "*****************************" << endl;
+    cout << bs.eulerPriceDiff(.1) << endl;
+    cout << bs.eulerPriceDiff(.3) << endl;
+    cout << bs.eulerPriceDiff(.5) << endl;
     Path<double> path = bs.generatePath(1000, 1);
-    vect2csv("python/datasets/bspath", path);
+    vect2csv("src/python/datasets/bspath", path);
 
     Path<double> path2 = bs.eulerDiscretization(1000, 1);
-    vect2csv("python/datasets/bseulerpath", path2);
-    std::cout << "*****************************" << std::endl;
-    std::cout << bs << std::endl;
+    vect2csv("src/python/datasets/bseulerpath", path2);
+    cout << "*****************************" << endl;
+    cout << bs << endl;
 
 
 

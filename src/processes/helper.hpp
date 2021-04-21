@@ -9,6 +9,7 @@ template <typename T>
 struct State {
     double time;
     T value;
+
     friend std::ostream & operator<<(std::ostream & o, State<T> const & s) {
         return o << s.time << ";" << s.value;
     }
@@ -20,7 +21,7 @@ struct StateWithTangent {
     T value;
     T tangent;
 
-    friend std::ostream & operator<<(std::ostream & o, State<T> const & s) {
+    friend std::ostream & operator<<(std::ostream & o, StateWithTangent<T> const & s) {
         return o << s.time << ";" << s.value << ";" << s.tangent;
     }
 };
@@ -52,7 +53,7 @@ struct PathWithTangent : protected std::vector<StateWithTangent<T>> {
     using vec::end;
     using vec::size;
 
-    friend std::ostream & operator<<(std::ostream & o, Path<T> const & p) {
+    friend std::ostream & operator<<(std::ostream & o, PathWithTangent<T> const & p) {
     for (auto const & st : p)
         o << st << std::endl;
     return o << std::endl;
