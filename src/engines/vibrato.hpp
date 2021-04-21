@@ -70,48 +70,6 @@ private:
 	NormalDistribution<D> normal = NormalDistribution<D>(0, 1);
 	double T;
 
-
-	void genGamma() {
-		this->process_.resetState();
-		State<D> priceState = this->process_->initialState;
-		State<D> tangentState = { priceState.time, 1 };
-		State<D> tangentState2 = { priceState.time, 0 };
-		for (int i = 0; i < n - 1; ++i) {
-			D Wh = h * normal();
-			priceState = this->process_->movePriceEuler(h, Wh);
-			tangentState = this->process_->moveTangentEuler(h, Wh);
-			tangentState2 = this->process_->moveTangent2Euler(h, Wh);
-		}
-	}
-
-	void genVega(double t) {
-		this->process_->resetState();
-		State<D> priceState = this->process_->initialState;
-		State<D> tangentState = { priceState.time, 0 };
-		for (int i = 0; i < n - 1; ++i) {
-			D Wh = h * normal();
-			tangentState = this->process_->moveTangentEuler(h, Wh);
-			tangentState.value += priceState.value * Wh;
-			priceState = this->process_->movePriceEuler(h, Wh);
-		}
-	}
-
-	void genVanna(double t) {
-		this->process_.resetState();
-		State<D> priceState = this->process_->initialState;
-		State<D> tangentState = { priceState.time, 1 };
-		State<D> tangentState2 = { priceState.time, 0.0001 };
-		double time = priceState.time;
-		for (int i = 0; i < n - 1; ++i) {
-			D Wh = h * normal();
-			tangentState2 = this->process_->moveTangent2Euler(h, Wh);
-			tangentState2.value += 2 * tangentState.value * Wh;
-			tangentState = this->process_.moveTangentEuler(h, Wh);
-			tangentState2.value += priceState.value * Wh;
-			priceState = this->process_.movePriceEuler(h, Wh);
-		}
-	}
-
 };
 
 #endif  // VIBRATO_HPP
