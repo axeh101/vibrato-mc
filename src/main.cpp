@@ -10,11 +10,10 @@ int main(void)
 
     // Normal distributions tests
     //
-    // NormalDistribution<> normal = NormalDistribution<>(0, 1);
-    // std::cout << normal.cdf(0) << std::endl;
-    // std::cout << normal.pdf(0) << std::endl;
-    // std::vector<double> v =  normal.generate(10000);
-    // vect2csv("normalrv", v);
+     NormalDistribution<> normal = NormalDistribution<>(0, 1);
+     std::cout << normal.cdf(0) << std::endl;
+     std::cout << normal.pdf(0) << std::endl;
+     std::vector<double> v =  normal.generate(10000);
 
     // Analytical formulation for an European Option
     //
@@ -43,7 +42,6 @@ int main(void)
     std::cout << bs.eulerPriceDiff(.3) << std::endl;
     std::cout << bs.eulerPriceDiff(.5) << std::endl;
     Path<double> path = bs.generatePath(1000, 1);
-    bs.resetState();
     vect2csv("python/datasets/bspath", path);
 
     Path<double> path2 = bs.eulerDiscretization(1000, 1);
