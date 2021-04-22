@@ -77,7 +77,7 @@ private:
             _moveProcess(deltaTangentProcess);
 			total += _firstOrderVibrato(
                     this->deltaTangentProcess.mun(h),
-                    this->deltaTangentProcess.mun(h),
+                    this->deltaTangentProcess.dmun(h),
                     this->deltaTangentProcess.sigman(h),
                     this->deltaTangentProcess.dsigman(h)
 			);
@@ -92,7 +92,7 @@ private:
             _moveProcess(vegaTangentProcess);
 			total += _firstOrderVibrato(
                     this->vegaTangentProcess.mun(h),
-                    this->vegaTangentProcess.mun(h),
+                    this->vegaTangentProcess.dmun(h),
                     this->vegaTangentProcess.sigman(h),
                     this->vegaTangentProcess.dsigman(h)
             );
@@ -107,7 +107,7 @@ private:
             _moveProcess(rhoTangentProcess);
 			total += _firstOrderVibrato(
                     this->rhoTangentProcess.mun(h),
-                    this->rhoTangentProcess.mun(h),
+                    this->rhoTangentProcess.dmun(h),
                     this->rhoTangentProcess.sigman(h),
                     this->rhoTangentProcess.dsigman(h)
             );
