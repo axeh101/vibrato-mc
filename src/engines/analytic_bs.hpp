@@ -27,7 +27,7 @@ class AnalyticalBS: public PricingEngine<D>
         void setParams(void){
             r = this->process_->rate();
             S = this->process_->initialState.value;
-            sigma = this->process_->vol(0);
+            sigma = this->process_->vol();
             K = this->option_->strike();
             T = this->option_->maturity();
             ract = exp(-r*T);

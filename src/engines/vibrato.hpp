@@ -7,6 +7,12 @@
 #include "../random/normal.hpp"
 #include "../processes/blackscholes.hpp"
 #include "../processes/helper.hpp"
+#include "../processes/tangent/delta.hpp"
+#include "../processes/tangent/gamma.hpp"
+#include "../processes/tangent/vanna.hpp"
+#include "../processes/tangent/rho.hpp"
+#include "../processes/tangent/vega.hpp"
+
 
 template<typename D>
 class VibratoBS: public PricingEngine<D> {
@@ -17,8 +23,7 @@ public:
 	int Mz;
 	double h;
 	bool antithetic = true;
-	VibratoBS(Option<D> *option, BlackScholesProcess<D> *process, int n, int M,
-			int Mz) :
+	VibratoBS(Option<D> *option, BlackScholesProcess<D> *process, int n, int M, int Mz) :
 			PricingEngine<D>(option, process), n(n), M(M), Mz(Mz) {
 		T = option->maturity();
 		h = T / n;
@@ -36,6 +41,9 @@ public:
 	}
 
 private:
+    DeltaTangent<D> deltaTangentProcess = DeltaTangent<D>({this->process_->initialState.time, 1}, this->process_);
+    VegaTangent<D> vegaTangentProcess = VegaTangent<D>({this->process_->initialState.time, 0}, this->process_);
+    RhoTangent<D> rhoTangentProcess = RhoTangent<D>({this->process_->initialState.time, 0}, this->process_);
 	NormalDistribution<D> normal = NormalDistribution<D>(0, 1);
 	double T;
 
@@ -45,11 +53,10 @@ private:
 		D Z;
 
 		for (int i = 0; i < M; ++i) {
-			_moveProcesses(1, 0);
+            _moveProcess(*this->process_);
 			// Replication step
-			double t = this->process_->priceState().time;
 			D value = this->process_->priceState().value;
-			D sigma = this->process_->vol(t);
+			D sigma = this->process_->vol();
 			D subtotal = 0.;
 			D mun = value * (1 + r * h);
 			D sigman = value * sigma * sqrt(h);
@@ -64,68 +71,55 @@ private:
 	}
 
 	virtual D _delta() {
-		D r = this->process_->rate();
 		D total = 0.;
 		for (int i = 0; i < M; ++i) {
-			_moveProcesses(1, 0);
-			double t = this->process_->priceState().time;
-			D sigma = this->process_->vol(t);
-			D value = this->process_->priceState().value;
-			D tangent = this->process_->tangentState().value;
-			D mun = value * (1 + r * h);
-			D sigman = value * sigma * sqrt(h);
-			D dmun = tangent * (1 + r * h);
-			D dsigman = tangent * sigma * sqrt(h);
-			total += _firstOrderVibrato(mun, sigman, dmun, dsigman);
+            _moveProcess(*this->process_);
+            _moveProcess(deltaTangentProcess);
+			total += _firstOrderVibrato(
+                    this->deltaTangentProcess.mun(h),
+                    this->deltaTangentProcess.mun(h),
+                    this->deltaTangentProcess.sigman(h),
+                    this->deltaTangentProcess.dsigman(h)
+			);
 		}
-		return exp(-r * T) * total / M;
-	}
-
-	virtual D _gamma() {
-		return 0;
+		return exp(-this->process_->rate() * T) * total / M;
 	}
 
 	virtual D _vega() {
-		D r = this->process_->rate();
 		D total = 0.;
-
 		for (int i = 0; i < M; ++i) {
-			// Replication step
-			_moveProcesses(1, 0);
-			double t = this->process_->priceState().time;
-			D sigma = this->process_->vol(t);
-			D value = this->process_->priceState().value;
-			D tangent = this->process_->tangentState().value;
-			D mun = value * (1 + r * h);
-			D sigman = value * sigma * sqrt(h);
-			D dmun = tangent * (1 + r * h);
-			D dsigman = (tangent * sigma + value) * sqrt(h);
-			total += _firstOrderVibrato(mun, sigman, dmun, dsigman);
+            _moveProcess(*this->process_);
+            _moveProcess(vegaTangentProcess);
+			total += _firstOrderVibrato(
+                    this->vegaTangentProcess.mun(h),
+                    this->vegaTangentProcess.mun(h),
+                    this->vegaTangentProcess.sigman(h),
+                    this->vegaTangentProcess.dsigman(h)
+            );
 		}
-		return exp(-r * T) * total / M;
+		return exp(-this->process_->rate() * T) * total / M;
 	}
 
+	virtual D _rho() {
+		D total = 0.;
+		for (int i = 0; i < M; ++i) {
+            _moveProcess(*this->process_);
+            _moveProcess(rhoTangentProcess);
+			total += _firstOrderVibrato(
+                    this->rhoTangentProcess.mun(h),
+                    this->rhoTangentProcess.mun(h),
+                    this->rhoTangentProcess.sigman(h),
+                    this->rhoTangentProcess.dsigman(h)
+            );
+		}
+		return exp(-this->process_->rate() * T) * total / M;
+	}
 	virtual D _vanna() {
 		return 0;
 	}
 
-	virtual D _rho() {
-		D r = this->process_->rate();
-		D total = 0.;
-		for (int i = 0; i < M; ++i) {
-			// Replication step
-			_moveProcesses(1, 0);
-			double t = this->process_->priceState().time;
-			D sigma = this->process_->vol(t);
-			D value = this->process_->priceState().value;
-			D tangent = this->process_->tangentState().value;
-			D mun = value * (1 + r * h);
-			D sigman = value * sigma * sqrt(h);
-			D dmun = tangent + h * (value + r * tangent);
-			D dsigman = tangent * sigma * sqrt(h);
-			total += _firstOrderVibrato(mun, sigman, dmun, dsigman);
-		}
-		return exp(-r * T) * total / M;
+	virtual D _gamma() {
+		return 0;
 	}
 
 	D _firstOrderVibrato(D mun, D sigman, D dmun, D dsigman) {
@@ -158,17 +152,12 @@ private:
 
 	}
 
-	void _moveProcesses(D tan1init = 1, D tan2init = 0) {
+	void _moveProcess(Process<D>& process) {
 		// First step: Compute the deltas up to the n-1
-		this->process_->resetState();
-		this->process_->initTangentState(tan1init);
-		this->process_->initTangent2State(tan2init);
-
+		process.resetState();
 		for (int i = 0; i < n - 1; ++i) {
 			D Wh = h * normal();
-			this->process_->movePriceEuler(h, Wh);
-			this->process_->moveTangentEuler(h, Wh);
-			this->process_->moveTangent2Euler(h, Wh);
+			process.movePriceEuler(h, Wh);
 		}
 		// End of first step
 	}

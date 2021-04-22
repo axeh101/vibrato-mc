@@ -56,6 +56,7 @@ class PricingEngine {
         virtual T premium()  {return premium_;};
 
         virtual void calculate() = 0;
+
         virtual void changeOption(Option<T>* option)
         {
         	option_ = option;

@@ -18,24 +18,8 @@ public:
 		return this->rate_ * this->priceState_.value;
 	}
 
-	virtual T diffusion(double t) const {
-		return vol(t) * this->priceState_.value;
-	}
-
-	virtual T tangentDrift() const {
-		return this->rate_ * this->tangentState_.value;
-	}
-
-	virtual T tangentDiffusion(double t) const {
-		return vol(t) * this->tangentState_.value;
-	}
-
-	virtual T tangent2Drift() const {
-		return this->rate_ * this->tangentState2_.value;
-	}
-
-	virtual T tangent2Diffusion(double t) const {
-		return vol(t) * this->tangentState2_.value;
+	virtual T diffusion() const {
+		return vol() * this->priceState_.value;
 	}
 
 	virtual State<T> nextIto(double h) {
@@ -45,9 +29,7 @@ public:
 		};
 	}
 
-	virtual T vol(double t) const {
-		// Constant volatility we keep the parameter
-		//for homogeneity with stochastic volatility models
+	virtual T vol() const {
 		return this->vol_;
 	}
 
@@ -74,6 +56,16 @@ public:
 	virtual T eulerPriceDiff(double h) {
 		return Process<T>::eulerPriceDiff(h, normal());
 	}
+
+    virtual T diffDriftDelta() const {return 0;}
+    virtual T diffDriftVega() const {return 0;}
+    virtual T diffDriftRho() const {return this->priceState_.value;}
+    virtual T diffDriftProcess() const {return this->rate_;}
+
+    virtual T diffDiffusionDelta() const {return 0;}
+    virtual T diffDiffusionVega() const {return this->priceState_.value;}
+    virtual T diffDiffusionRho() const {return 0;}
+    virtual T diffDiffusionProcess() const {return this->vol_;}
 
 	virtual std::ostream& describe(std::ostream &o) const {
 		return Process<T>::describe(o) << "Rate: " << this->rate_ << std::endl
