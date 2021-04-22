@@ -28,8 +28,8 @@ class AnalyticalBS: public PricingEngine<D>
             r = this->process_->rate();
             S = this->process_->initialState.value;
             sigma = this->process_->vol(0);
-            K = this->option_.strike();
-            T = this->option_.maturity();
+            K = this->option_->strike();
+            T = this->option_->maturity();
             ract = exp(-r*T);
             d1 = (log(S/K) + (r + 0.5 * sigma * sigma) * T) / (sigma * sqrt(T));
             d2 = d1  - sigma * sqrt(T);
@@ -40,7 +40,7 @@ class AnalyticalBS: public PricingEngine<D>
         }
 
         virtual D _rho() const {
-            if (this->option_.type() == OptionType::Call) {
+            if (this->option_->type() == OptionType::Call) {
                 return K * T * ract * nd2;
             }else {
                return  K * T * ract * (nd2-1);
@@ -53,7 +53,7 @@ class AnalyticalBS: public PricingEngine<D>
         }
 
         virtual D _delta() const {
-            if (this->option_.type() == OptionType::Call) {
+            if (this->option_->type() == OptionType::Call) {
                 return nd1;
             }else{
                 return nd1 - 1;
@@ -65,7 +65,7 @@ class AnalyticalBS: public PricingEngine<D>
         }
 
         virtual D _theta() const {
-            if (this->option_.type() == OptionType::Call) {
+            if (this->option_->type() == OptionType::Call) {
                 return S * pd1 * sigma / (2 * sqrt(T)) + r * K * ract * nd2;
             }else {
                 return S * pd1 * sigma / (2 * sqrt(T)) - r * K * ract * (1-nd2);
@@ -82,7 +82,7 @@ class AnalyticalBS: public PricingEngine<D>
         }
 
         virtual D _premium() {
-            if (this->option_.type() == OptionType::Call) {
+            if (this->option_->type() == OptionType::Call) {
                 return S * nd1 - K * ract * nd2;
             }else{
                 return S * (nd1-1) + ract * K * (1-nd2);
@@ -90,7 +90,7 @@ class AnalyticalBS: public PricingEngine<D>
         }
 
     public:
-        AnalyticalBS(Option<D>& option, BlackScholesProcess<D>& process)
+        AnalyticalBS(Option<D>* option, BlackScholesProcess<D>* process)
             : PricingEngine<D>(option, process){
         		setParams();
             };
@@ -99,6 +99,7 @@ class AnalyticalBS: public PricingEngine<D>
 
         virtual void calculate() override {
         	setParams();
+        	this->premium_ = _premium();
         	this->delta_ = _delta();
         	this->gamma_ = _gamma();
         	this->vega_ = _vega();

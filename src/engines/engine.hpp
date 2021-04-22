@@ -10,7 +10,7 @@ template <typename T>
 class PricingEngine {
 
     protected:
-        Option<T>& option_;
+        Option<T>* option_;
         Process<T>* process_;
         T delta_;
         T gamma_;
@@ -18,24 +18,33 @@ class PricingEngine {
         T vega_;
         T rho_;
         T vanna_;
+        T premium_;
 
     public:
-        PricingEngine(Option<T>& option, Process<T>& process)
-            :option_(option), process_(&process){};
+        PricingEngine(Option<T>* option, Process<T>* process)
+            :option_(option), process_(process){};
 
-        virtual~PricingEngine() = default;
+        virtual~PricingEngine(){
+
+        	option_=nullptr;
+        	process_=nullptr;
+        	delete option_;
+        	delete process_;
+
+        };
 
         friend std::ostream & operator<<(std::ostream & o, const PricingEngine<T>& engine)  {
             return engine.displayResults(o);
         }
         virtual std::ostream & displayResults(std::ostream& o) const {
             return o << option_ <<std::endl << *process_ << std::endl <<
-                "Delta: " << delta_ << std::endl <<
-                "Gamma: " << gamma_ << std::endl <<
-                "Vega: " <<  vega_<< std::endl <<
-                "Vanna: " << vanna_ << std::endl <<
-                "Rho: " << rho_ << std::endl <<
-                "Theta: " << theta_ << std::endl;
+                    "Premium: " << premium_ << std::endl <<
+					"Delta: " << delta_ << std::endl <<
+					"Gamma: " << gamma_ << std::endl <<
+					"Vega: " <<  vega_<< std::endl <<
+					"Vanna: " << vanna_ << std::endl <<
+					"Rho: " << rho_ << std::endl <<
+					"Theta: " << theta_ << std::endl;
         };
 
         virtual T rho()  {return rho_;};
@@ -44,8 +53,13 @@ class PricingEngine {
         virtual T gamma()   {return gamma_;};
         virtual T theta()  {return theta_;};
         virtual T vanna()  {return vanna_;};
+        virtual T premium()  {return premium_;};
 
         virtual void calculate() = 0;
+        virtual void changeOption(Option<T>* option)
+        {
+        	option_ = option;
+        }
 
 
 };
