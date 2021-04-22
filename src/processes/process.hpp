@@ -29,11 +29,13 @@ public:
 	}
 
 	virtual T eulerTangentDiff(double h, T Wh) {
-		return tangentDrift() * h + tangentDiffusion(tangentState_.time) * sqrt(h) * Wh;
+		return tangentDrift() * h
+				+ tangentDiffusion(tangentState_.time) * sqrt(h) * Wh;
 	}
 
 	virtual T eulerTangent2Diff(double h, T Wh) {
-		return tangent2Drift() * h + tangent2Diffusion(tangentState2_.time) * sqrt(h) * Wh;
+		return tangent2Drift() * h
+				+ tangent2Diffusion(tangentState2_.time) * sqrt(h) * Wh;
 	}
 
 	virtual Path<T> eulerDiscretization(int nsamples, double horizon) {
@@ -80,11 +82,14 @@ public:
 		return tangentState_;
 	}
 
+	virtual State<T> moveTangent2Euler(double h, T Wh) {
+		tangentState2_ = nextTangent2Euler(h, Wh);
+		return tangentState_;
+	}
+
 	virtual void resetState() {
 		priceState_ = initialState;
 	}
-
-
 
 	virtual State<T> priceState() {
 		return priceState_;
@@ -92,6 +97,10 @@ public:
 
 	virtual State<T> tangentState() {
 		return tangentState_;
+	}
+
+	virtual State<T> tangent2State() {
+		return tangentState2_;
 	}
 
 	virtual void initTangentState(T value) {
@@ -115,14 +124,13 @@ public:
 	virtual T vol(double t) const =0;
 	virtual T rate() const = 0;
 
-
-	protected:
-		T rate_;
-		T vol_;
-		State<T> priceState_;
-		State<T> tangentState_;
-		State<T> tangentState2_;
-		std::string name_;
+protected:
+	T rate_;
+	T vol_;
+	State<T> priceState_;
+	State<T> tangentState_;
+	State<T> tangentState2_;
+	std::string name_;
 };
 
 #endif  // PROCESS_HPP
