@@ -16,24 +16,24 @@ public:
 	}
 
 	virtual T drift() const = 0;
-	virtual T diffusion() const = 0;
+	virtual T diffusion(double t) const = 0;
 
 	virtual T tangentDrift() const = 0;
-	virtual T tangentDiffusion() const = 0;
+	virtual T tangentDiffusion(double t) const = 0;
 
 	virtual T tangent2Drift() const = 0;
-	virtual T tangent2Diffusion() const = 0;
+	virtual T tangent2Diffusion(double t) const = 0;
 
 	virtual T eulerPriceDiff(double h, T Wh) {
-		return drift() * h + diffusion() * sqrt(h) * Wh;
+		return drift() * h + diffusion(priceState_.time) * sqrt(h) * Wh;
 	}
 
 	virtual T eulerTangentDiff(double h, T Wh) {
-		return tangentDrift() * h + tangentDiffusion() * sqrt(h) * Wh;
+		return tangentDrift() * h + tangentDiffusion(tangentState_.time) * sqrt(h) * Wh;
 	}
 
 	virtual T eulerTangent2Diff(double h, T Wh) {
-		return tangent2Drift() * h + tangent2Diffusion() * sqrt(h) * Wh;
+		return tangent2Drift() * h + tangent2Diffusion(tangentState2_.time) * sqrt(h) * Wh;
 	}
 
 	virtual Path<T> eulerDiscretization(int nsamples, double horizon) {
