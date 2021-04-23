@@ -13,7 +13,7 @@ class DigitalOption: public Option<T> {
 
         T payoff(T price) const override
         {
-            return this->type_ * (price - this->strike_) > 0.0;
+            return (this->type_ * (price - this->strike_) > 0.0);
         }
 };
 

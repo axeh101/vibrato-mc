@@ -56,7 +56,11 @@ private:
 		D Z;
 
 		for (int i = 0; i < M; ++i) {
-			_moveProcess(*this->process_);
+			this->process_->resetState();
+			for (int i = 0; i < n - 1; ++i) {
+				D Wh = h * normal();
+				this->process_->movePriceEuler(h, Wh);
+			}
 			// Replication step
 			D value = this->process_->priceState().value;
 			D sigma = this->process_->vol();
@@ -76,8 +80,13 @@ private:
 	virtual D _delta() {
 		D total = 0.;
 		for (int i = 0; i < M; ++i) {
-			_moveProcess(*this->process_);
-			_moveProcess(deltaTangentProcess);
+			this->process_->resetState();
+			deltaTangentProcess.resetState();
+			for (int i = 0; i < n - 1; ++i) {
+				D Wh = h * normal();
+				this->process_->movePriceEuler(h, Wh);
+				deltaTangentProcess.movePriceEuler(h, Wh);
+			}
 			total += _firstOrderVibrato(this->deltaTangentProcess.mun(h),
 					this->deltaTangentProcess.dmun(h),
 					this->deltaTangentProcess.sigman(h),
@@ -89,8 +98,13 @@ private:
 	virtual D _vega() {
 		D total = 0.;
 		for (int i = 0; i < M; ++i) {
-			_moveProcess(*this->process_);
-			_moveProcess(vegaTangentProcess);
+			this->process_->resetState();
+			vegaTangentProcess.resetState();
+			for (int i = 0; i < n - 1; ++i) {
+				D Wh = h * normal();
+				this->process_->movePriceEuler(h, Wh);
+				vegaTangentProcess.movePriceEuler(h, Wh);
+			}
 			total += _firstOrderVibrato(this->vegaTangentProcess.mun(h),
 					this->vegaTangentProcess.dmun(h),
 					this->vegaTangentProcess.sigman(h),
@@ -102,8 +116,13 @@ private:
 	virtual D _rho() {
 		D total = 0.;
 		for (int i = 0; i < M; ++i) {
-			_moveProcess(*this->process_);
-			_moveProcess(rhoTangentProcess);
+			this->process_->resetState();
+			rhoTangentProcess.resetState();
+			for (int i = 0; i < n - 1; ++i) {
+				D Wh = h * normal();
+				this->process_->movePriceEuler(h, Wh);
+				rhoTangentProcess.movePriceEuler(h, Wh);
+			}
 			total += _firstOrderVibrato(this->rhoTangentProcess.mun(h),
 					this->rhoTangentProcess.dmun(h),
 					this->rhoTangentProcess.sigman(h),
@@ -149,15 +168,6 @@ private:
 
 	}
 
-	void _moveProcess(Process<D> &process) {
-		// First step: Compute the deltas up to the n-1
-		process.resetState();
-		for (int i = 0; i < n - 1; ++i) {
-			D Wh = h * normal();
-			process.movePriceEuler(h, Wh);
-		}
-		// End of first step
-	}
 };
 
 #endif  // VIBRATO_HPP

@@ -4,27 +4,24 @@
 using namespace std;
 int main() {
 
-	double maturity = .25;
+	double maturity = 1;
 	double strike = 100;
 	double rate = .05;
-	double vol = .3;
-	int n = 100;
+	double vol = .2;
+	int n = 25;
 	int M = 1000;
-	int Mz = 100;
+	int Mz = 10;
 
 	// Product definition
-	VanillaOption<double> callVanilla(maturity, strike, OptionType::Call);
-	VanillaOption<double> putVanilla(maturity, strike, OptionType::Put);
 	DigitalOption<double> callDigital(maturity, strike, OptionType::Call);
-	DigitalOption<double> putDigital(maturity, strike, OptionType::Put);
 
 	// Black Scholes process definition
 	State<double> initialState = { 0.0, 100 };
 	BlackScholesProcess<double> bs(initialState, rate, vol);
 
 	// Pricing engines definition
-	AnalyticalBS<double> bsEngine = AnalyticalBS<double>(&callVanilla, &bs);
-	VibratoBS<double> vibratoEngine = VibratoBS<double>(&callVanilla, &bs, n, M,
+	AnalyticalDigitalBS<double> bsEngine = AnalyticalDigitalBS<double>(&callDigital, &bs);
+	VibratoBS<double> vibratoEngine = VibratoBS<double>(&callDigital, &bs, n, M,
 			Mz);
 
 	// Premium tests
@@ -47,7 +44,7 @@ int main() {
 	Path<double> *vibratoRhoAntithetic = new Path<double>(201);
 
 
-	double price = 80;
+	double price = 1;
 	for (int i = 0; i < 201; ++i) {
 		bs.initialState.value = price;
 		bsEngine.calculate();
@@ -72,24 +69,26 @@ int main() {
 		(*vibratoRho)[i] = { price, vibratoEngine.rho() };
 
 
-		price += 0.25;
+		price += 1;
 	}
-	vect2csv("src/python/datasets/call_analytic_premium", *analyticPremium);
-	vect2csv("src/python/datasets/call_vibrato_premium", *vibratoPremium);
-	vect2csv("src/python/datasets/call_analytic_delta", *analyticDelta);
-	vect2csv("src/python/datasets/call_analytic_vega", *analyticVega);
-	vect2csv("src/python/datasets/call_analytic_rho", *analyticRho);
+	vect2csv("src/python/datasets/digicall_analytic_premium", *analyticPremium);
+	vect2csv("src/python/datasets/digicall_vibrato_premium", *vibratoPremium);
+	vect2csv("src/python/datasets/digicall_analytic_delta", *analyticDelta);
+	vect2csv("src/python/datasets/digicall_analytic_vega", *analyticVega);
+	vect2csv("src/python/datasets/digicall_analytic_rho", *analyticRho);
 
-	vect2csv("src/python/datasets/call_vibrato_delta", *vibratoDelta);
-	vect2csv("src/python/datasets/call_vibrato_delta_antithetic",
+	vect2csv("src/python/datasets/digicall_vibrato_delta", *vibratoDelta);
+	vect2csv("src/python/datasets/digicall_vibrato_delta_antithetic",
 			*vibratoDeltaAntithetic);
-	vect2csv("src/python/datasets/call_vibrato_vega", *vibratoVega);
-	vect2csv("src/python/datasets/call_vibrato_vega_antithetic",
+	vect2csv("src/python/datasets/digicall_vibrato_vega", *vibratoVega);
+	vect2csv("src/python/datasets/digicall_vibrato_vega_antithetic",
 			*vibratoVegaAntithetic);
-	vect2csv("src/python/datasets/call_vibrato_rho", *vibratoRho);
-	vect2csv("src/python/datasets/call_vibrato_rho_antithetic",
+	vect2csv("src/python/datasets/digicall_vibrato_rho", *vibratoRho);
+	vect2csv("src/python/datasets/digicall_vibrato_rho_antithetic",
 			*vibratoRhoAntithetic);
 
+//	std::cout << bsEngine << std::endl;
+//	std::cout << vibratoEngine << std::endl;
 
 	delete vibratoPremium;
 	delete analyticPremium;

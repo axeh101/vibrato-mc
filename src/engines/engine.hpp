@@ -37,7 +37,7 @@ class PricingEngine {
             return engine.displayResults(o);
         }
         virtual std::ostream & displayResults(std::ostream& o) const {
-            return o << option_ <<std::endl << *process_ << std::endl <<
+            return o << *option_ <<std::endl << *process_ << std::endl <<
                     "Premium: " << premium_ << std::endl <<
 					"Delta: " << delta_ << std::endl <<
 					"Gamma: " << gamma_ << std::endl <<

@@ -14,8 +14,9 @@
 #include "random/normal.hpp"
 
 // Engines
-#include "engines/montecarlo.hpp"
 #include "engines/analytic_bs.hpp"
+#include "engines/analytic_digital_bs.hpp"
+
 #include "engines/vibrato.hpp"
 #include "engines/vibratoad.hpp"
 

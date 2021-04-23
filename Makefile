@@ -14,6 +14,5 @@ BINDIR := bin
 # PREREQUISITES & STUFFS
 
 all:
-	$(CC) -o $(BINDIR)/$(PROJECT_NAME) $(CFLAGS) src/vibrato.cpp
-#	$(CC) -o $(BINDIR)/$(PROJECT_NAME) $(CFLAGS) src/main.cpp
+	$(CC) -o $(BINDIR)/$(PROJECT_NAME) $(CFLAGS) src/vibrato_digital.cpp
 

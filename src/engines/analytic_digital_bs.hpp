@@ -1,5 +1,5 @@
-#ifndef ANALYTIC_BS_HPP
-#define ANALYTIC_BS_HPP
+#ifndef ANALYTIC_iDIGITAL_BS_HPP
+#define ANALYTIC_DIGITAL_BS_HPP
 
 #include <cmath>
 #include "engine.hpp"
@@ -7,7 +7,7 @@
 #include "../processes/blackscholes.hpp"
 
 template <typename D>
-class AnalyticalVanillaBS: public PricingEngine<D>
+class AnalyticalDigitalBS: public PricingEngine<D>
 {
     private:
         NormalDistribution<D> normal = NormalDistribution<D>(0,1);
@@ -40,62 +40,60 @@ class AnalyticalVanillaBS: public PricingEngine<D>
         }
 
         virtual D _rho() const {
+            D crho = ract * pd2 * sqrt(T)  / sigma - T * ract * nd2;
             if (this->option_->type() == OptionType::Call) {
-                return K * T * ract * nd2;
+                return crho;
             }else {
-               return  K * T * ract * (nd2-1);
+               return  - T * ract - crho;
             }
 
         }
 
         virtual D _vega() const {
-            return S * pd1 * sqrt(T);
+            return - d1 * pd2 * ract / sigma;
         }
 
         virtual D _delta() const {
-            if (this->option_->type() == OptionType::Call) {
-                return nd1;
-            }else{
-                return nd1 - 1;
-            }
+                return this->option_->type() * ract * pd2 / (sigma * sqrt(T) * S);
         }
 
         virtual D _gamma() const {
-            return  pd1 / (S * sigma * sqrt(T));
+            return  _vega() / (sigma * S * S *T);
         }
 
         virtual D _theta() const {
+            D ctheta = ract * nd2 * r;
+            ctheta+= ract * pd2  * (d1 / (2 * T) - r / (sigma* sqrt(T)));
             if (this->option_->type() == OptionType::Call) {
-                return S * pd1 * sigma / (2 * sqrt(T)) + r * K * ract * nd2;
+                return ctheta;
             }else {
-                return S * pd1 * sigma / (2 * sqrt(T)) - r * K * ract * (1-nd2);
+                return r * ract - ctheta;
             }
         }
 
         virtual D _vanna() const {
-            return this->vega_ * (1 - d1/(sigma * sqrt(T))) / S;
-
+            return  ract * pd2 * (1 - d1 * d2 ) / (S * sigma * sigma * sqrt(T));
         }
 
         virtual D _volga() const {
-            return  this->vega_ * d1 * d2 / sigma;
+            return ract * pd2 * (d1 * d1 * d2 - d1 - d2) / (sigma * sigma);
         }
 
         virtual D _premium() {
             if (this->option_->type() == OptionType::Call) {
-                return S * nd1 - K * ract * nd2;
+                return ract * nd2;
             }else{
-                return S * (nd1-1) + ract * K * (1-nd2);
+                return ract * ( 1 - nd2);
             }
         }
 
     public:
-        AnalyticalVanillaBS(Option<D>* option, BlackScholesProcess<D>* process)
+        AnalyticalDigitalBS(Option<D>* option, BlackScholesProcess<D>* process)
             : PricingEngine<D>(option, process){
         		setParams();
             };
 
-        virtual~AnalyticalVanillaBS() = default;
+        virtual~AnalyticalDigitalBS() = default;
 
         virtual void calculate() override {
         	setParams();
@@ -110,4 +108,4 @@ class AnalyticalVanillaBS: public PricingEngine<D>
 };
 
 
-#endif  // ANALYTIC_BS_HPP
+#endif  // ANALYTIC_iDIGITAL_BS_HPP

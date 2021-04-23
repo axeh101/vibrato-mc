@@ -32,8 +32,8 @@ int main(void)
     double rate= .02;
     double vol = .03;
     BlackScholesProcess<double> bs(initial_state, rate, vol);
-    AnalyticalBS<double> bsEngineCall = AnalyticalBS<double>(&callVanilla, &bs);
-    AnalyticalBS<double> bsEnginePut = AnalyticalBS<double>(&putVanilla, &bs);
+    AnalyticalVanillaBS<double> bsEngineCall = AnalyticalVanillaBS<double>(&callVanilla, &bs);
+    AnalyticalVanillaBS<double> bsEnginePut = AnalyticalVanillaBS<double>(&putVanilla, &bs);
     bsEngineCall.calculate();
     bsEnginePut.calculate();
     cout << bsEngineCall << endl;
