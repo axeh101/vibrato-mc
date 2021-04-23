@@ -13,7 +13,6 @@
 #include "../processes/tangent/rho.hpp"
 #include "../processes/tangent/vega.hpp"
 
-
 template<typename D>
 class VibratoBS: public PricingEngine<D> {
 
@@ -23,7 +22,8 @@ public:
 	int Mz;
 	double h;
 	bool antithetic = true;
-	VibratoBS(Option<D> *option, BlackScholesProcess<D> *process, int n, int M, int Mz) :
+	VibratoBS(Option<D> *option, BlackScholesProcess<D> *process, int n, int M,
+			int Mz) :
 			PricingEngine<D>(option, process), n(n), M(M), Mz(Mz) {
 		T = option->maturity();
 		h = T / n;
@@ -41,9 +41,12 @@ public:
 	}
 
 private:
-    DeltaTangent<D> deltaTangentProcess = DeltaTangent<D>({this->process_->initialState.time, 1}, this->process_);
-    VegaTangent<D> vegaTangentProcess = VegaTangent<D>({this->process_->initialState.time, 0}, this->process_);
-    RhoTangent<D> rhoTangentProcess = RhoTangent<D>({this->process_->initialState.time, 0}, this->process_);
+	DeltaTangent<D> deltaTangentProcess = DeltaTangent<D>(
+			{ this->process_->initialState.time, 1 }, this->process_);
+	VegaTangent<D> vegaTangentProcess = VegaTangent<D>(
+			{ this->process_->initialState.time, 0 }, this->process_);
+	RhoTangent<D> rhoTangentProcess = RhoTangent<D>(
+			{ this->process_->initialState.time, 0 }, this->process_);
 	NormalDistribution<D> normal = NormalDistribution<D>(0, 1);
 	double T;
 
@@ -53,7 +56,7 @@ private:
 		D Z;
 
 		for (int i = 0; i < M; ++i) {
-            _moveProcess(*this->process_);
+			_moveProcess(*this->process_);
 			// Replication step
 			D value = this->process_->priceState().value;
 			D sigma = this->process_->vol();
@@ -73,14 +76,12 @@ private:
 	virtual D _delta() {
 		D total = 0.;
 		for (int i = 0; i < M; ++i) {
-            _moveProcess(*this->process_);
-            _moveProcess(deltaTangentProcess);
-			total += _firstOrderVibrato(
-                    this->deltaTangentProcess.mun(h),
-                    this->deltaTangentProcess.dmun(h),
-                    this->deltaTangentProcess.sigman(h),
-                    this->deltaTangentProcess.dsigman(h)
-			);
+			_moveProcess(*this->process_);
+			_moveProcess(deltaTangentProcess);
+			total += _firstOrderVibrato(this->deltaTangentProcess.mun(h),
+					this->deltaTangentProcess.dmun(h),
+					this->deltaTangentProcess.sigman(h),
+					this->deltaTangentProcess.dsigman(h));
 		}
 		return exp(-this->process_->rate() * T) * total / M;
 	}
@@ -88,14 +89,12 @@ private:
 	virtual D _vega() {
 		D total = 0.;
 		for (int i = 0; i < M; ++i) {
-            _moveProcess(*this->process_);
-            _moveProcess(vegaTangentProcess);
-			total += _firstOrderVibrato(
-                    this->vegaTangentProcess.mun(h),
-                    this->vegaTangentProcess.dmun(h),
-                    this->vegaTangentProcess.sigman(h),
-                    this->vegaTangentProcess.dsigman(h)
-            );
+			_moveProcess(*this->process_);
+			_moveProcess(vegaTangentProcess);
+			total += _firstOrderVibrato(this->vegaTangentProcess.mun(h),
+					this->vegaTangentProcess.dmun(h),
+					this->vegaTangentProcess.sigman(h),
+					this->vegaTangentProcess.dsigman(h));
 		}
 		return exp(-this->process_->rate() * T) * total / M;
 	}
@@ -103,14 +102,12 @@ private:
 	virtual D _rho() {
 		D total = 0.;
 		for (int i = 0; i < M; ++i) {
-            _moveProcess(*this->process_);
-            _moveProcess(rhoTangentProcess);
-			total += _firstOrderVibrato(
-                    this->rhoTangentProcess.mun(h),
-                    this->rhoTangentProcess.dmun(h),
-                    this->rhoTangentProcess.sigman(h),
-                    this->rhoTangentProcess.dsigman(h)
-            );
+			_moveProcess(*this->process_);
+			_moveProcess(rhoTangentProcess);
+			total += _firstOrderVibrato(this->rhoTangentProcess.mun(h),
+					this->rhoTangentProcess.dmun(h),
+					this->rhoTangentProcess.sigman(h),
+					this->rhoTangentProcess.dsigman(h));
 		}
 		return exp(-this->process_->rate() * T) * total / M;
 	}
@@ -122,7 +119,7 @@ private:
 		return 0;
 	}
 
-	D _firstOrderVibrato(D mun, D sigman, D dmun, D dsigman) {
+	D _firstOrderVibrato(D mun, D dmun, D sigman, D dsigman) {
 		D Z;
 		D espmu = 0;
 		D espsigma = 0;
@@ -152,7 +149,7 @@ private:
 
 	}
 
-	void _moveProcess(Process<D>& process) {
+	void _moveProcess(Process<D> &process) {
 		// First step: Compute the deltas up to the n-1
 		process.resetState();
 		for (int i = 0; i < n - 1; ++i) {

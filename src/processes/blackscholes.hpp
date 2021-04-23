@@ -57,15 +57,36 @@ public:
 		return Process<T>::eulerPriceDiff(h, normal());
 	}
 
-    virtual T diffDriftDelta() const {return 0;}
-    virtual T diffDriftVega() const {return 0;}
-    virtual T diffDriftRho() const {return this->priceState_.value;}
-    virtual T diffDriftProcess() const {return this->rate_;}
+	virtual T diffDriftDelta() const {
+		return 0;
+	}
 
-    virtual T diffDiffusionDelta() const {return 0;}
-    virtual T diffDiffusionVega() const {return this->priceState_.value;}
-    virtual T diffDiffusionRho() const {return 0;}
-    virtual T diffDiffusionProcess() const {return this->vol_;}
+	virtual T diffDiffusionDelta() const {
+		return 0;
+	}
+
+	virtual T diffDriftVega() const {
+		return 0;
+	}
+	virtual T diffDriftRho() const {
+		return this->priceState_.value;
+	}
+
+	virtual T diffDiffusionVega() const {
+		return this->priceState_.value;
+	}
+
+	virtual T diffDiffusionRho() const {
+		return 0;
+	}
+
+	virtual T diffDiffusionProcess() const {
+		return this->vol_;
+	}
+
+	virtual T diffDriftProcess() const {
+		return this->rate_;
+	}
 
 	virtual std::ostream& describe(std::ostream &o) const {
 		return Process<T>::describe(o) << "Rate: " << this->rate_ << std::endl
