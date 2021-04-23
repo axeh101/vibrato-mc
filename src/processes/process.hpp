@@ -106,7 +106,7 @@ class TangentProcess : public Process<D>
         }
 
         virtual D sigman(double h) {
-            return this->parent_->diffusion() * sqrt(h);
+            return this->parent_->diffusion() ; // * sqrt(h);
         }
         
         virtual D dsigman(double h) {

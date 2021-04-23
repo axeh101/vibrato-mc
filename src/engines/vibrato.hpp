@@ -66,7 +66,7 @@ private:
 			D sigma = this->process_->vol();
 			D subtotal = 0.;
 			D mun = value * (1 + r * h);
-			D sigman = value * sigma * sqrt(h);
+			D sigman = value * sigma;
 			for (int j = 1; j <= Mz; j++) {
 				Z = normal();
 				subtotal += this->option_->payoff(mun + sigman * Z);
@@ -151,9 +151,9 @@ private:
 				payoffPlus = this->option_->payoff(mun + sigman * Z);
 				payoffMinus = this->option_->payoff(mun - sigman * Z);
 				payoffMu = this->option_->payoff(mun);
-				espmu += 0.5 * Z * (payoffPlus - payoffMinus) / sigman;
+				espmu += 0.5 * Z * (payoffPlus - payoffMinus) / (sigman);
 				espsigma += 0.5 * (Z * Z - 1)
-						* (payoffPlus - 2 * payoffMu + payoffMinus) / sigman;
+						* (payoffPlus - 2 * payoffMu + payoffMinus) / (sigman);
 			}
 		} else {
 			D payoff;
