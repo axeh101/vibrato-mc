@@ -2,14 +2,17 @@
 #include "all.hpp"
 
 using namespace std;
+
 int main() {
+
+	std::cout << "***** Staring vibrato for digital options !" << std::endl;
 
 	double maturity = 1;
 	double strike = 100;
 	double rate = .05;
 	double vol = .2;
 	int n = 25;
-	int M = 10000;
+	int M = 1000;
 	int Mz = 10;
 
 	// Product definition
@@ -20,7 +23,8 @@ int main() {
 	BlackScholesProcess<double> bs(initialState, rate, vol);
 
 	// Pricing engines definition
-	AnalyticalDigitalBS<double> bsEngine = AnalyticalDigitalBS<double>(&callDigital, &bs);
+	AnalyticalDigitalBS<double> bsEngine = AnalyticalDigitalBS<double>(
+			&callDigital, &bs);
 	VibratoBS<double> vibratoEngine = VibratoBS<double>(&callDigital, &bs, n, M,
 			Mz);
 
@@ -43,7 +47,6 @@ int main() {
 	Path<double> *analyticRho = new Path<double>(201);
 	Path<double> *vibratoRhoAntithetic = new Path<double>(201);
 
-
 	double price = 1;
 	for (int i = 0; i < 201; ++i) {
 		bs.initialState.value = price;
@@ -52,7 +55,6 @@ int main() {
 		(*analyticDelta)[i] = { price, bsEngine.delta() };
 		(*analyticVega)[i] = { price, bsEngine.vega() };
 		(*analyticRho)[i] = { price, bsEngine.rho() };
-
 
 		vibratoEngine.antithetic = true;
 		vibratoEngine.calculate();
@@ -67,7 +69,6 @@ int main() {
 		(*vibratoDelta)[i] = { price, vibratoEngine.delta() };
 		(*vibratoVega)[i] = { price, vibratoEngine.vega() };
 		(*vibratoRho)[i] = { price, vibratoEngine.rho() };
-
 
 		price += 1;
 	}
@@ -103,6 +104,7 @@ int main() {
 	delete vibratoVegaAntithetic;
 	delete vibratoRhoAntithetic;
 
+	std::cout << "***** Vibrato for digital options Terminated!" << std::endl;
 
 	return 0;
 }
