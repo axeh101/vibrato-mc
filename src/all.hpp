@@ -23,6 +23,7 @@
 // Processes
 #include "processes/blackscholes.hpp"
 #include "processes/heston.hpp"
+#include "processes/cir.hpp"
 #include "processes/helper.hpp"
 
 #endif  // ALL_HPP
