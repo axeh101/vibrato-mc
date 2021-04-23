@@ -11,7 +11,7 @@ int main() {
 	double strike = 100;
 	double rate = .05;
 	double vol = .2;
-	int n = 25;
+	int n = 100;
 	int M = 1000;
 	int Mz = 10;
 

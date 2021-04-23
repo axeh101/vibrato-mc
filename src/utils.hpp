@@ -7,27 +7,18 @@
 
 using namespace std;
 
-inline unsigned p2(unsigned n) { unsigned u=1; return u<<=n;}
-
-
 template<typename T>
-void vect2csv(std::string name, Path<T>& v){
-    std::cout << "Writing to file " << endl;
-    ofstream myfile (name + ".csv");
-    if (myfile.is_open())
-    {
-        for (auto i:v)
-        {
-            myfile << i << endl;
-        }
-        myfile.close();
-    std::cout << "Writing to file.....Done! " << endl;
-    }
-    else
-    {
-        std::cout << "Unable to open file" << std::endl;
-    }
+void vect2csv(std::string name, Path<T> &v) {
+	ofstream myfile(name + ".csv");
+	if (myfile.is_open()) {
+		for (auto i : v) {
+			myfile << i << endl;
+		}
+		myfile.close();
+		std::cout << "Writing to file " << name << ".csv....Done! " << endl;
+	} else {
+		std::cout << "Unable to open file " << name << ".csv" << std::endl;
+	}
 }
-
 
 #endif  // UTILS_HPP
