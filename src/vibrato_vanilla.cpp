@@ -9,8 +9,8 @@ int main() {
 	double rate = .05;
 	double vol = .2;
 	int n = 25;
-	int M = 100000;
-	int Mz = 1;
+	int M = 10000;
+	int Mz = 10;
 
 	// Product definition
 	VanillaOption<double> callVanilla(maturity, strike, OptionType::Call);
