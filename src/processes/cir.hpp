@@ -12,16 +12,17 @@ class CoxIngersollRossProcess: public Process<T>
 private:
 
 	T eta_;
-	T volvol_;
 
 
 
 public:
 
-	CoxIngersollRossProcess(State<T> initialState, T kappa, T eta, T volvol) :
-			Process<T>(initialState, "Cox-Ingresoll-Ross"), eta_(eta), volvol_(volvol) {
-		assert(2*kappa*eta > volvol*volvol);
+    // d vt = kappa (eta - vt) dt + vol sqrt(vt) dWt
+	CoxIngersollRossProcess(State<T> initialState, T kappa, T eta, T vol) :
+			Process<T>(initialState, "Cox-Ingeresoll-Ross"), eta_(eta) {
+		assert(2*kappa*eta > vol*vol);
 		this->rate_ = kappa;
+		this->vol_ = vol;
 	}
 	virtual~CoxIngersollRossProcess() = default;
 
@@ -30,11 +31,11 @@ public:
 	}
 
 	virtual T diffusion() const {
-		return volvol_ * sqrt(this->priceState_.value);
+		return this->vol_ * sqrt(this->priceState_.value);
 	}
 
 	virtual T vol() const {
-		return volvol_;
+		return this->vol_;
 	}
 
 	virtual T rate() const {
@@ -52,7 +53,7 @@ public:
 				"Rate: " << this->rate_ << std::endl <<
 				"Kappa:" << this->rate_ << std::endl <<
 				"Eta:" << eta_ << std::endl <<
-				"Vol Vol:" << volvol_ << std::endl <<
+				"Vol Vol:" << this->vol_ << std::endl <<
 				std::endl;
 	}
 
