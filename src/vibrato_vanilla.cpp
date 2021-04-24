@@ -13,9 +13,9 @@ int main() {
 	double strike = 100;
 	double rate = .05;
 	double vol = .2;
-	int n = 100;
-	int M = 1000;
-	int Mz = 10;
+	int n = 25;
+	int M = 100000;
+	int Mz = 1;
 
 	// Product definition
 	VanillaOption<double> callVanilla(maturity, strike, OptionType::Call);
@@ -28,27 +28,28 @@ int main() {
 	auto bsEngine = AnalyticalVanillaBS<double>(&callVanilla, &bs);
 	auto vibratoEngine = VibratoBS<double>(&callVanilla, &bs, n, M, Mz);
 
+	int vecSize = 200;
 	// Premium tests
-	auto *vibratoPremium = new Path<double>(201);
-	auto *analyticPremium = new Path<double>(201);
+	auto *vibratoPremium = new Path<double>(vecSize);
+	auto *analyticPremium = new Path<double>(vecSize);
 
 	// delta tests
-	auto *vibratoDelta = new Path<double>(201);
-	auto *analyticDelta = new Path<double>(201);
-	auto *vibratoDeltaAntithetic = new Path<double>(201);
+	auto *vibratoDelta = new Path<double>(vecSize);
+	auto *analyticDelta = new Path<double>(vecSize);
+	auto *vibratoDeltaAntithetic = new Path<double>(vecSize);
 
 	// vega tests
-	auto *vibratoVega = new Path<double>(201);
-	auto *analyticVega = new Path<double>(201);
-	auto *vibratoVegaAntithetic = new Path<double>(201);
+	auto *vibratoVega = new Path<double>(vecSize);
+	auto *analyticVega = new Path<double>(vecSize);
+	auto *vibratoVegaAntithetic = new Path<double>(vecSize);
 
 	// rho tests
-	auto *vibratoRho = new Path<double>(201);
-	auto *analyticRho = new Path<double>(201);
-	auto *vibratoRhoAntithetic = new Path<double>(201);
+	auto *vibratoRho = new Path<double>(vecSize);
+	auto *analyticRho = new Path<double>(vecSize);
+	auto *vibratoRhoAntithetic = new Path<double>(vecSize);
 
 	double price = 60;
-	for (int i = 0; i < 201; ++i) {
+	for (int i = 0; i < vecSize; ++i) {
 		bs.initialState.value = price;
 		bsEngine.calculate();
 		(*analyticPremium)[i] = { price, bsEngine.premium() };
