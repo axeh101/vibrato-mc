@@ -7,169 +7,236 @@
 #include "../random/normal.hpp"
 #include "../processes/blackscholes.hpp"
 #include "../processes/helper.hpp"
-#include "../processes/tangent/delta.hpp"
-#include "../processes/tangent/gamma.hpp"
-#include "../processes/tangent/vanna.hpp"
-#include "../processes/tangent/rho.hpp"
-#include "../processes/tangent/vega.hpp"
+#include "../processes/tangent/all.hpp"
 
 
 template<typename D>
-class VibratoBS: public PricingEngine<D> {
+class VibratoBS : public PricingEngine<D> {
 
 public:
-	int n;
-	int M;
-	int Mz;
-	double h;
-	bool antithetic = true;
-	VibratoBS(Option<D> *option, BlackScholesProcess<D> *process, int n, int M,
-			int Mz) :
-			PricingEngine<D>(option, process), n(n), M(M), Mz(Mz) {
-		T = option->maturity();
-		h = T / n;
-	}
-	virtual ~VibratoBS() = default;
+    int n;
+    int M;
+    int Mz;
+    double h;
+    bool antithetic = true;
 
-	virtual void calculate() override
-	{
-		this->premium_ = _premium();
-		this->delta_ = _delta();
-//		this->gamma_ = _gamma();
-		this->vega_ = _vega();
-//		this->vanna_ = _vanna();
-		this->rho_ = _rho();
-	}
+    VibratoBS(Option<D> *option, BlackScholesProcess<D> *process, int n, int M,
+              int Mz) :
+            PricingEngine<D>(option, process), n(n), M(M), Mz(Mz) {
+        T = option->maturity();
+        h = T / n;
+    }
+
+    virtual ~VibratoBS() = default;
+
+    virtual void calculate() override {
+        this->premium_ = _premium();
+        this->delta_ = _delta();
+        this->vega_ = _vega();
+        this->rho_ = _rho() - T * this->premium_;
+        this->theta_ = _theta() + this->process_->rate() * this->premium_;
+        this->vanna_ = _vanna();
+        this->gamma_ = _gamma();
+
+    }
 
 private:
-	DeltaTangent<D> deltaTangentProcess = DeltaTangent<D>(
-			{ this->process_->initialState.time, 1 }, this->process_);
-	VegaTangent<D> vegaTangentProcess = VegaTangent<D>(
-			{ this->process_->initialState.time, 0 }, this->process_);
-	RhoTangent<D> rhoTangentProcess = RhoTangent<D>(
-			{ this->process_->initialState.time, 0 }, this->process_);
-	NormalDistribution<D> normal = NormalDistribution<D>(0, 1);
-	double T;
+    DeltaTangent<D> deltaTangentProcess = DeltaTangent<D>({this->process_->initialState.time, 1}, this->process_);
+    VegaTangent<D> vegaTangentProcess = VegaTangent<D>({this->process_->initialState.time, 0}, this->process_);
+    RhoTangent<D> rhoTangentProcess = RhoTangent<D>({this->process_->initialState.time, 0}, this->process_);
+    ThetaTangent<D> thetaTangentProcess = ThetaTangent<D>({this->process_->initialState.time, 0}, this->process_);
 
-	virtual D _premium() {
-		D r = this->process_->rate();
-		D total = 0.;
-		D Z;
+    NormalDistribution<D> normal = NormalDistribution<D>(0, 1);
+    double T;
 
-		for (int i = 0; i < M; ++i) {
-			this->process_->resetState();
-			for (int i = 0; i < n - 1; ++i) {
-				D Z = normal();
-				this->process_->movePriceEuler(h, Z);
-			}
-			// Replication step
-			D value = this->process_->priceState().value;
-			D sigma = this->process_->vol();
-			D subtotal = 0.;
-			D mun = value * (1 + r * h);
-			D sigman = value * sigma * sqrt(h);
-			for (int j = 1; j <= Mz; j++) {
-				Z = normal();
-				subtotal += this->option_->payoff(mun + sigman * Z);
-			}
-			// End of Replication step
-			total += subtotal / Mz;
-		}
-		return exp(-r * T) * total / M;
-	}
+    virtual D _premium() {
+        D r = this->process_->rate();
+        D total = 0.;
+        D Z;
 
-	virtual D _delta() {
-		D total = 0.;
-		for (int i = 0; i < M; ++i) {
-			this->process_->resetState();
-			deltaTangentProcess.resetState();
-			for (int i = 0; i < n - 1; ++i) {
-				D Z = normal();
-				deltaTangentProcess.movePriceEuler(h, Z);
+        for (int i = 0; i < M; ++i) {
+            this->process_->resetState();
+            for (int i = 0; i < n - 1; ++i) {
+                D Z = normal();
+                this->process_->movePriceEuler(h, Z);
+            }
+            // Replication step
+            D value = this->process_->priceState().value;
+            D sigma = this->process_->vol();
+            D subtotal = 0.;
+            D mun = value * (1 + r * h);
+            D sigman = value * sigma * sqrt(h);
+            for (int j = 1; j <= Mz; j++) {
+                Z = normal();
+                subtotal += this->option_->payoff(mun + sigman * Z);
+            }
+            // End of Replication step
+            total += subtotal / Mz;
+        }
+        return exp(-r * T) * total / M;
+    }
+
+    virtual D _delta() {
+        D total = 0.;
+        for (int i = 0; i < M; ++i) {
+            this->process_->resetState();
+            deltaTangentProcess.resetState();
+            for (int i = 0; i < n - 1; ++i) {
+                D Z = normal();
+                deltaTangentProcess.movePriceEuler(h, Z);
                 this->process_->movePriceEuler(h, Z);
 
             }
-			total += _firstOrderVibrato(this->deltaTangentProcess.mun(h),
-					this->deltaTangentProcess.dmun(h),
-					this->deltaTangentProcess.sigman(h),
-					this->deltaTangentProcess.dsigman(h));
-		}
-		return exp(-this->process_->rate() * T) * total / M;
-	}
+            total += _firstOrderVibrato(this->deltaTangentProcess.mun(h),
+                                        this->deltaTangentProcess.dmun(h),
+                                        this->deltaTangentProcess.sigman(h),
+                                        this->deltaTangentProcess.dsigman(h));
+        }
+        return exp(-this->process_->rate() * T) * total / M;
+    }
 
-	virtual D _vega() {
-		D total = 0.;
-		for (int i = 0; i < M; ++i) {
-			this->process_->resetState();
-			vegaTangentProcess.resetState();
-			for (int i = 0; i < n - 1; ++i) {
-				D Z = normal();
-				vegaTangentProcess.movePriceEuler(h, Z);
+    virtual D _vega() {
+        D total = 0.;
+        for (int i = 0; i < M; ++i) {
+            this->process_->resetState();
+            vegaTangentProcess.resetState();
+            for (int i = 0; i < n - 1; ++i) {
+                D Z = normal();
+                vegaTangentProcess.movePriceEuler(h, Z);
                 this->process_->movePriceEuler(h, Z);
             }
-			total += _firstOrderVibrato(this->vegaTangentProcess.mun(h),
-					this->vegaTangentProcess.dmun(h),
-					this->vegaTangentProcess.sigman(h),
-					this->vegaTangentProcess.dsigman(h));
-		}
-		return exp(-this->process_->rate() * T) * total / M;
-	}
+            total += _firstOrderVibrato(this->vegaTangentProcess.mun(h),
+                                        this->vegaTangentProcess.dmun(h),
+                                        this->vegaTangentProcess.sigman(h),
+                                        this->vegaTangentProcess.dsigman(h));
+        }
+        return exp(-this->process_->rate() * T) * total / M;
+    }
 
-	virtual D _rho() {
-		D total = 0.;
-		for (int i = 0; i < M; ++i) {
-			this->process_->resetState();
-			rhoTangentProcess.resetState();
-			for (int i = 0; i < n - 1; ++i) {
+    virtual D _rho() {
+        D total = 0.;
+        for (int i = 0; i < M; ++i) {
+            this->process_->resetState();
+            rhoTangentProcess.resetState();
+            for (int i = 0; i < n - 1; ++i) {
                 D Z = normal();
                 rhoTangentProcess.movePriceEuler(h, Z);
                 this->process_->movePriceEuler(h, Z);
-			}
-			total += _firstOrderVibrato(this->rhoTangentProcess.mun(h),
-					this->rhoTangentProcess.dmun(h),
-					this->rhoTangentProcess.sigman(h),
-					this->rhoTangentProcess.dsigman(h));
-		}
-		return exp(-this->process_->rate() * T) * total / M;
-	}
-	virtual D _vanna() {
-		return 0;
-	}
+            }
+            total += _firstOrderVibrato(this->rhoTangentProcess.mun(h),
+                                        this->rhoTangentProcess.dmun(h),
+                                        this->rhoTangentProcess.sigman(h),
+                                        this->rhoTangentProcess.dsigman(h));
+        }
+        return exp(-this->process_->rate() * T) * total / M;
+    }
 
-	virtual D _gamma() {
-		return 0;
-	}
+    virtual D _theta() {
+        D total = 0.;
+        for (int i = 0; i < M; ++i) {
+            this->process_->resetState();
+            thetaTangentProcess.resetState();
+            for (int i = 0; i < n - 1; ++i) {
+                D Z = normal();
+                thetaTangentProcess.movePriceEuler(h, Z);
+                this->process_->movePriceEuler(h, Z);
+            }
+            total += _firstOrderVibrato(this->thetaTangentProcess.mun(h),
+                                        this->thetaTangentProcess.dmun(h),
+                                        this->thetaTangentProcess.sigman(h),
+                                        this->thetaTangentProcess.dsigman(h));
+        }
+        return exp(-this->process_->rate() * T) * total / M;
+    }
 
-	D _firstOrderVibrato(D mun, D dmun, D sigman, D dsigman) {
-		D Z;
-		D espmu = 0;
-		D espsigma = 0;
-		if (antithetic) {
-			D payoffPlus;
-			D payoffMinus;
-			D payoffMu;
-			for (int j = 1; j <= Mz; j++) {
-				Z = normal();
-				payoffPlus = this->option_->payoff(mun + sigman * Z);
-				payoffMinus = this->option_->payoff(mun - sigman * Z);
-				payoffMu = this->option_->payoff(mun);
-				espmu += 0.5 * Z * (payoffPlus - payoffMinus) / (sigman);
-				espsigma += 0.5 * (Z * Z - 1)
-						* (payoffPlus - 2 * payoffMu + payoffMinus) / (sigman);
-			}
-		} else {
-			D payoff;
-			for (int j = 1; j <= Mz; j++) {
-				Z = normal();
-				payoff = this->option_->payoff(mun + sigman * Z);
-				espmu += Z * payoff / (sigman);
-				espsigma += 0.5 * (Z * Z - 1) * payoff / (sigman * sigman);
-			}
-		}
-		return (dmun * espmu + dsigman * espsigma) / Mz;
+    virtual D _gamma() {
+        D total = 0.;
+        for (int i = 0; i < M; ++i) {
+            this->process_->resetState();
+            deltaTangentProcess.resetState();
+            for (int i = 0; i < n - 1; ++i) {
+                D Z = normal();
+                deltaTangentProcess.movePriceEuler(h, Z);
+                this->process_->movePriceEuler(h, Z);
+            }
+            total += _secondOrderVibrato(this->deltaTangentProcess.mun(h),
+                                        this->deltaTangentProcess.dmun(h),
+                                        this->deltaTangentProcess.sigman(h),
+                                        this->deltaTangentProcess.dsigman(h));
+        }
+        return exp(-this->process_->rate() * T) * total / M;
+    }
 
-	}
+    virtual D _vanna() {
+        return 0;
+    }
 
+    D _firstOrderVibrato(D mun, D dmun, D sigman, D dsigman) {
+        D Z;
+        D espmu = 0;
+        D espsigma = 0;
+        if (antithetic) {
+            D payoffPlus;
+            D payoffMinus;
+            D payoffMu;
+            for (int j = 0; j < Mz; j++) {
+                Z = normal();
+                payoffPlus = this->option_->payoff(mun + sigman * Z);
+                payoffMinus = this->option_->payoff(mun - sigman * Z);
+                payoffMu = this->option_->payoff(mun);
+                espmu += Z * (payoffPlus - payoffMinus) / (2 * sigman);
+                espsigma += (Z * Z - 1) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman);
+            }
+        } else {
+            D payoff;
+            for (int j = 0; j < Mz; j++) {
+                Z = normal();
+                payoff = this->option_->payoff(mun + sigman * Z);
+                espmu += Z * payoff / (sigman);
+                espsigma += 0.5 * (Z * Z - 1) * payoff / (sigman * sigman);
+            }
+        }
+        return (dmun * espmu + dsigman * espsigma) / Mz;
+
+    }
+
+    D _secondOrderVibrato(D mun, D dmun, D sigman, D dsigman) {
+        D Z;
+        D espmusq = 0;
+        D espsigmasq = 0;
+        D espmusigma = 0;
+        D Z2;
+        D Z4;
+        if (antithetic) {
+            D payoffPlus;
+            D payoffMinus;
+            D payoffMu;
+            for (int j = 0; j < Mz; j++) {
+                Z = normal();
+                Z2 = Z*Z;
+                Z4 = Z2 * Z2;
+                payoffPlus = this->option_->payoff(mun + sigman * Z);
+                payoffMinus = this->option_->payoff(mun - sigman * Z);
+                payoffMu = this->option_->payoff(mun);
+                espmusq += (Z2 - 1) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman * sigman);
+                espsigmasq += (Z4 - 5 * Z2 + 2) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman * sigman);
+                espmusigma += Z*(Z2 - 3) * (payoffPlus - payoffMinus) / (sigman * sigman);
+            }
+        } else {
+            D payoff;
+            for (int j = 0; j < Mz; j++) {
+                Z = normal();
+                Z2 = Z*Z;
+                Z4 = Z2 * Z2;
+                payoff = this->option_->payoff(mun + sigman * Z);
+                espmusq += (Z2 - 1) * payoff / (sigman * sigman);
+                espsigmasq += (Z4 - 5 * Z2 + 2) * payoff / (sigman * sigman);
+                espmusigma += Z*(Z2 - 3) * payoff / (sigman * sigman);
+            }
+        }
+        return (dmun * dmun * espmusq +  dsigman * dsigman * espsigmasq + 2 * dsigman * dmun * espmusigma ) / Mz;
+
+    }
 };
 
 #endif  // VIBRATO_HPP
