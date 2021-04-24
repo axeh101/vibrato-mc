@@ -35,3 +35,6 @@ heston:
 
 main:
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-main $(CFLAGS) src/main.cpp
+
+clean:
+	rm -rf $(BINDIR)/vibrato-*
