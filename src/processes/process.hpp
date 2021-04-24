@@ -69,15 +69,47 @@ public:
 	virtual T vol() const =0;
 	virtual T rate() const = 0;
 
-    virtual T diffDriftDelta() const {return 0;}
-    virtual T diffDriftVega()  const {return 0;}
-    virtual T diffDriftRho()  const {return 0;}
-    virtual T diffDriftProcess()  const {return 0;}
 
-    virtual T diffDiffusionDelta() const {return 0;}
+	/**
+	 * computes db(theta, Xkn)/dsigma
+	 */
+    virtual T diffDriftVega()  const {return 0;}
+
+
+	/**
+	 * computes db(theta, Xkn)/dr
+	 */
+    virtual T diffDriftRho()  const {return 0;}
+
+	/**
+	 * computes dsigma(theta, Xkn)/dsigma
+	 */
     virtual T diffDiffusionVega() const {return 0;}
+
+	/**
+	 * computes dsigma(theta, Xkn)/dr
+	 */
     virtual T diffDiffusionRho() const {return 0;}
-    virtual T diffDiffusionProcess() const {return 0;}
+
+	/**
+	 * computes db(theta, Xkn)/dx
+	 */
+    virtual T diffDriftX()  const {return 0;}
+
+	/**
+	 * computes dsigma(theta, Xkn)/dx
+	 */
+    virtual T diffDiffusionX() const {return 0;}
+
+	/**
+	 * computes d²b(theta, Xkn)/dx²
+	 */
+    virtual T diffDriftX2()  const {return 0;}
+
+	/**
+	 * computes d²sigma(theta, Xkn)/dx²
+	 */
+    virtual T diffDiffusionX2() const {return 0;}
 
 protected:
 	T rate_;
@@ -106,11 +138,11 @@ class TangentProcess : public Process<D>
         }
 
         virtual D sigman(double h) {
-            return this->parent_->diffusion() ; // * sqrt(h);
+            return this->parent_->diffusion();
         }
         
         virtual D dsigman(double h) {
-            return this->diffusion()  * sqrt(h);
+            return this->diffusion() * sqrt(h);
         }
 
 

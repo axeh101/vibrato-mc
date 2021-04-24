@@ -1,8 +1,12 @@
 #ifndef BLACKSCHOLES_HPP
 #define BLACKSCHOLES_HPP
 
-#include "process.hpp"
+#include <cmath>
+#include <iostream>
+
 #include "../random/normal.hpp"
+#include "helper.hpp"
+#include "process.hpp"
 
 template<typename T>
 class BlackScholesProcess: public Process<T> {
@@ -13,6 +17,8 @@ public:
 		this->vol_ = vol;
 		this->rate_ = rate;
 	}
+
+	virtual~BlackScholesProcess() = default;
 
 	virtual T drift() const {
 		return this->rate_ * this->priceState_.value;
@@ -57,34 +63,19 @@ public:
 		return Process<T>::eulerPriceDiff(h, normal());
 	}
 
-	virtual T diffDriftDelta() const {
-		return 0;
-	}
-
-	virtual T diffDiffusionDelta() const {
-		return 0;
-	}
-
-	virtual T diffDriftVega() const {
-		return 0;
-	}
-	virtual T diffDriftRho() const {
-		return this->priceState_.value;
-	}
-
 	virtual T diffDiffusionVega() const {
 		return this->priceState_.value;
 	}
 
-	virtual T diffDiffusionRho() const {
-		return 0;
+	virtual T diffDriftRho() const {
+		return this->priceState_.value;
 	}
 
-	virtual T diffDiffusionProcess() const {
+	virtual T diffDiffusionX() const {
 		return this->vol_;
 	}
 
-	virtual T diffDriftProcess() const {
+	virtual T diffDriftX() const {
 		return this->rate_;
 	}
 
@@ -92,6 +83,7 @@ public:
 		return Process<T>::describe(o) << "Rate: " << this->rate_ << std::endl
 				<< "Volatility: " << this->vol_ << std::endl;
 	}
+
 private:
 
 	NormalDistribution<T> normal = NormalDistribution<T>(0, 1);

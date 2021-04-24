@@ -10,52 +10,54 @@ int main() {
 	const std::string destination = "src/python/datasets/";
 
 	double maturity = 1;
-	double strike = 100;
-	double rate = .05;
+	double strike = 90;
+	double rate = .00135;
 	int n = 100;
-	int M = 1000;
+	int M = 10000;
 	int Mz = 10;
-	double vol = .02;
+	double vol = .2;
 	// Heston params
-	double initialVol = .6;
-	double correl = -0.6;
-	double kappa = 16;
-	double eta = 0.1;
-	double volvol = 0.3;
+	double initialVol = 0.028087;
+	double correlation = .5;
+	double kappa = 2.931465; // mean reversion
+	double eta = 0.101; // long run mean
+	double volvol = 0.01;
 
 	// Product definition
 	VanillaOption<double> call(maturity, strike, OptionType::Call);
 
 	// Heston & CIR process definition
-	State<double> initialState = { 0.0, 100 };
+	State<double> initialState = { 0.0, 60 };
 	CoxIngersollRossProcess<double> cir( { 0, initialVol}, kappa, eta, volvol);
-	HestonProcess<double> heston(initialState, &cir, rate, correl);
+	HestonProcess<double> heston(initialState, &cir, rate, correlation);
 	BlackScholesProcess<double> bs(initialState, rate, vol);
 
 	// Pricing engines definition
 	auto ve = VibratoBS<double>(&call, &bs, n, M, Mz);
 	auto be = AnalyticalDigitalBS<double>(&call, &bs);
+
+	double vecSize = 101;
 	// Premium tests
-	auto *vibratoPremium = new Path<double>(201);
-	auto *analyticPremium = new Path<double>(201);
+	auto *vibratoPremium = new Path<double>(vecSize);
+	auto *analyticPremium = new Path<double>(vecSize);
 
 	// delta tests
-    auto  *vibratoDelta = new Path<double>(201);
-    auto  *analyticDelta = new Path<double>(201);
-    auto  *vibratoDeltaAntithetic = new Path<double>(201);
+    auto  *vibratoDelta = new Path<double>(vecSize);
+    auto  *analyticDelta = new Path<double>(vecSize);
+    auto  *vibratoDeltaAntithetic = new Path<double>(vecSize);
 
 	// vega tests
-    auto *vibratoVega = new Path<double>(201);
-    auto *analyticVega = new Path<double>(201);
-    auto *vibratoVegaAntithetic = new Path<double>(201);
+    auto *vibratoVega = new Path<double>(vecSize);
+    auto *analyticVega = new Path<double>(vecSize);
+    auto *vibratoVegaAntithetic = new Path<double>(vecSize);
 
 	// rho tests
-    auto *vibratoRho = new Path<double>(201);
-    auto *analyticRho = new Path<double>(201);
-    auto *vibratoRhoAntithetic = new Path<double>(201);
+    auto *vibratoRho = new Path<double>(vecSize);
+    auto *analyticRho = new Path<double>(vecSize);
+    auto *vibratoRhoAntithetic = new Path<double>(vecSize);
 
 	double price = 60;
-	for (int i = 0; i < 201; ++i) {
+	for (int i = 0; i < 101; ++i) {
 		bs.initialState.value = price;
 		be.calculate();
 		(*analyticPremium)[i] = { price, be.premium() };
