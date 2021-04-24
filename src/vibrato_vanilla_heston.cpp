@@ -7,6 +7,8 @@ int main() {
 
 	std::cout << "***** Staring vibrato for options (Heston) !" << std::endl;
 
+	const std::string destination = "src/python/datasets/";
+
 	double maturity = 1;
 	double strike = 100;
 	double rate = .05;
@@ -31,26 +33,26 @@ int main() {
 	BlackScholesProcess<double> bs(initialState, rate, vol);
 
 	// Pricing engines definition
-	VibratoBS<double> ve = VibratoBS<double>(&call, &bs, n, M, Mz);
-	AnalyticalDigitalBS<double> be = AnalyticalDigitalBS<double>(&call, &bs);
+	auto ve = VibratoBS<double>(&call, &bs, n, M, Mz);
+	auto be = AnalyticalDigitalBS<double>(&call, &bs);
 	// Premium tests
-	Path<double> *vibratoPremium = new Path<double>(201);
-	Path<double> *analyticPremium = new Path<double>(201);
+	auto *vibratoPremium = new Path<double>(201);
+	auto *analyticPremium = new Path<double>(201);
 
 	// delta tests
-	Path<double> *vibratoDelta = new Path<double>(201);
-	Path<double> *analyticDelta = new Path<double>(201);
-	Path<double> *vibratoDeltaAntithetic = new Path<double>(201);
+    auto  *vibratoDelta = new Path<double>(201);
+    auto  *analyticDelta = new Path<double>(201);
+    auto  *vibratoDeltaAntithetic = new Path<double>(201);
 
 	// vega tests
-	Path<double> *vibratoVega = new Path<double>(201);
-	Path<double> *analyticVega = new Path<double>(201);
-	Path<double> *vibratoVegaAntithetic = new Path<double>(201);
+    auto *vibratoVega = new Path<double>(201);
+    auto *analyticVega = new Path<double>(201);
+    auto *vibratoVegaAntithetic = new Path<double>(201);
 
 	// rho tests
-	Path<double> *vibratoRho = new Path<double>(201);
-	Path<double> *analyticRho = new Path<double>(201);
-	Path<double> *vibratoRhoAntithetic = new Path<double>(201);
+    auto *vibratoRho = new Path<double>(201);
+    auto *analyticRho = new Path<double>(201);
+    auto *vibratoRhoAntithetic = new Path<double>(201);
 
 	double price = 60;
 	for (int i = 0; i < 201; ++i) {
@@ -76,25 +78,19 @@ int main() {
 
 		price += 0.5;
 	}
-	vect2csv("src/python/datasets/call_heston_analytic_premium", *analyticPremium);
-	vect2csv("src/python/datasets/call_heston_analytic_delta", *analyticDelta);
-	vect2csv("src/python/datasets/call_heston_analytic_vega", *analyticVega);
-	vect2csv("src/python/datasets/call_heston_analytic_rho", *analyticRho);
+	vect2csv(destination + "call_heston_analytic_premium", *analyticPremium);
+	vect2csv(destination + "call_heston_analytic_delta", *analyticDelta);
+	vect2csv(destination + "call_heston_analytic_vega", *analyticVega);
+	vect2csv(destination + "call_heston_analytic_rho", *analyticRho);
 
-	vect2csv("src/python/datasets/call_heston_vibrato_premium", *vibratoPremium);
+	vect2csv(destination + "call_heston_vibrato_premium", *vibratoPremium);
 
-	vect2csv("src/python/datasets/call_heston_vibrato_delta", *vibratoDelta);
-	vect2csv("src/python/datasets/call_heston_vibrato_delta_antithetic",
-			*vibratoDeltaAntithetic);
-	vect2csv("src/python/datasets/call_heston_vibrato_vega", *vibratoVega);
-	vect2csv("src/python/datasets/call_heston_vibrato_vega_antithetic",
-			*vibratoVegaAntithetic);
-	vect2csv("src/python/datasets/call_heston_vibrato_rho", *vibratoRho);
-	vect2csv("src/python/datasets/call_heston_vibrato_rho_antithetic",
-			*vibratoRhoAntithetic);
-
-//	std::cout << bsEngine << std::endl;
-//	std::cout << vibratoEngine << std::endl;
+	vect2csv(destination + "call_heston_vibrato_delta", *vibratoDelta);
+	vect2csv(destination + "call_heston_vibrato_delta_antithetic",*vibratoDeltaAntithetic);
+	vect2csv(destination + "call_heston_vibrato_vega", *vibratoVega);
+	vect2csv(destination + "call_heston_vibrato_vega_antithetic",*vibratoVegaAntithetic);
+	vect2csv(destination + "call_heston_vibrato_rho", *vibratoRho);
+	vect2csv(destination + "call_heston_vibrato_rho_antithetic",*vibratoRhoAntithetic);
 
 	delete vibratoPremium;
 	delete analyticPremium;

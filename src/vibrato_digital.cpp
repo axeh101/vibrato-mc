@@ -5,106 +5,100 @@ using namespace std;
 
 int main() {
 
-	std::cout << "***** Staring vibrato for digital options !" << std::endl;
+    std::cout << "***** Staring vibrato for digital options !" << std::endl;
 
-	double maturity = 1;
-	double strike = 100;
-	double rate = .05;
-	double vol = .2;
-	int n = 25;
-	int M = 1000;
-	int Mz = 10;
+    const std::string destination = "src/python/datasets/";
 
-	// Product definition
-	DigitalOption<double> callDigital(maturity, strike, OptionType::Call);
+    double maturity = 1;
+    double strike = 100;
+    double rate = .05;
+    double vol = .2;
+    int n = 25;
+    int M = 1000;
+    int Mz = 10;
 
-	// Black Scholes process definition
-	State<double> initialState = { 0.0, 100 };
-	BlackScholesProcess<double> bs(initialState, rate, vol);
+    // Product definition
+    DigitalOption<double> callDigital(maturity, strike, OptionType::Call);
 
-	// Pricing engines definition
-	AnalyticalDigitalBS<double> bsEngine = AnalyticalDigitalBS<double>(
-			&callDigital, &bs);
-	VibratoBS<double> vibratoEngine = VibratoBS<double>(&callDigital, &bs, n, M,
-			Mz);
+    // Black Scholes process definition
+    State<double> initialState = {0.0, 100};
+    BlackScholesProcess<double> bs(initialState, rate, vol);
 
-	// Premium tests
-	Path<double> *vibratoPremium = new Path<double>(201);
-	Path<double> *analyticPremium = new Path<double>(201);
+    // Pricing engines definition
+    auto bsEngine = AnalyticalDigitalBS<double>(&callDigital, &bs);
+    auto vibratoEngine = VibratoBS<double>(&callDigital, &bs, n, M, Mz);
 
-	// delta tests
-	Path<double> *vibratoDelta = new Path<double>(201);
-	Path<double> *analyticDelta = new Path<double>(201);
-	Path<double> *vibratoDeltaAntithetic = new Path<double>(201);
+    // Premium tests
+    auto *vibratoPremium = new Path<double>(201);
+    auto *analyticPremium = new Path<double>(201);
 
-	// vega tests
-	Path<double> *vibratoVega = new Path<double>(201);
-	Path<double> *analyticVega = new Path<double>(201);
-	Path<double> *vibratoVegaAntithetic = new Path<double>(201);
+    // delta tests
+    auto *vibratoDelta = new Path<double>(201);
+    auto *analyticDelta = new Path<double>(201);
+    auto *vibratoDeltaAnti = new Path<double>(201);
 
-	// rho tests
-	Path<double> *vibratoRho = new Path<double>(201);
-	Path<double> *analyticRho = new Path<double>(201);
-	Path<double> *vibratoRhoAntithetic = new Path<double>(201);
+    // vega tests
+    auto *vibratoVega = new Path<double>(201);
+    auto *analyticVega = new Path<double>(201);
+    auto *vibratoVegaAnti = new Path<double>(201);
 
-	double price = 1;
-	for (int i = 0; i < 201; ++i) {
-		bs.initialState.value = price;
-		bsEngine.calculate();
-		(*analyticPremium)[i] = { price, bsEngine.premium() };
-		(*analyticDelta)[i] = { price, bsEngine.delta() };
-		(*analyticVega)[i] = { price, bsEngine.vega() };
-		(*analyticRho)[i] = { price, bsEngine.rho() };
+    // rho tests
+    auto *vibratoRho = new Path<double>(201);
+    auto *analyticRho = new Path<double>(201);
+    auto *vibratoRhoAnti = new Path<double>(201);
 
-		vibratoEngine.antithetic = true;
-		vibratoEngine.calculate();
-		(*vibratoPremium)[i] = { price, vibratoEngine.premium() };
+    double price = 1;
+    for (int i = 0; i < 201; ++i) {
+        bs.initialState.value = price;
+        bsEngine.calculate();
+        (*analyticPremium)[i] = {price, bsEngine.premium()};
+        (*analyticDelta)[i] = {price, bsEngine.delta()};
+        (*analyticVega)[i] = {price, bsEngine.vega()};
+        (*analyticRho)[i] = {price, bsEngine.rho()};
 
-		(*vibratoVegaAntithetic)[i] = { price, vibratoEngine.vega() };
-		(*vibratoDeltaAntithetic)[i] = { price, vibratoEngine.delta() };
-		(*vibratoRhoAntithetic)[i] = { price, vibratoEngine.rho() };
+        vibratoEngine.antithetic = true;
+        vibratoEngine.calculate();
+        (*vibratoPremium)[i] = {price, vibratoEngine.premium()};
 
-		vibratoEngine.antithetic = false;
-		vibratoEngine.calculate();
-		(*vibratoDelta)[i] = { price, vibratoEngine.delta() };
-		(*vibratoVega)[i] = { price, vibratoEngine.vega() };
-		(*vibratoRho)[i] = { price, vibratoEngine.rho() };
+        (*vibratoVegaAnti)[i] = {price, vibratoEngine.vega()};
+        (*vibratoDeltaAnti)[i] = {price, vibratoEngine.delta()};
+        (*vibratoRhoAnti)[i] = {price, vibratoEngine.rho()};
 
-		price += 1;
-	}
-	vect2csv("src/python/datasets/digicall_analytic_premium", *analyticPremium);
-	vect2csv("src/python/datasets/digicall_vibrato_premium", *vibratoPremium);
-	vect2csv("src/python/datasets/digicall_analytic_delta", *analyticDelta);
-	vect2csv("src/python/datasets/digicall_analytic_vega", *analyticVega);
-	vect2csv("src/python/datasets/digicall_analytic_rho", *analyticRho);
+        vibratoEngine.antithetic = false;
+        vibratoEngine.calculate();
+        (*vibratoDelta)[i] = {price, vibratoEngine.delta()};
+        (*vibratoVega)[i] = {price, vibratoEngine.vega()};
+        (*vibratoRho)[i] = {price, vibratoEngine.rho()};
 
-	vect2csv("src/python/datasets/digicall_vibrato_delta", *vibratoDelta);
-	vect2csv("src/python/datasets/digicall_vibrato_delta_antithetic",
-			*vibratoDeltaAntithetic);
-	vect2csv("src/python/datasets/digicall_vibrato_vega", *vibratoVega);
-	vect2csv("src/python/datasets/digicall_vibrato_vega_antithetic",
-			*vibratoVegaAntithetic);
-	vect2csv("src/python/datasets/digicall_vibrato_rho", *vibratoRho);
-	vect2csv("src/python/datasets/digicall_vibrato_rho_antithetic",
-			*vibratoRhoAntithetic);
+        price += 1;
+    }
+    vect2csv(destination + "digicall_analytic_premium", *analyticPremium);
+    vect2csv(destination + "digicall_vibrato_premium", *vibratoPremium);
+    vect2csv(destination + "digicall_analytic_delta", *analyticDelta);
+    vect2csv(destination + "digicall_analytic_vega", *analyticVega);
+    vect2csv(destination + "digicall_analytic_rho", *analyticRho);
 
-//	std::cout << bsEngine << std::endl;
-//	std::cout << vibratoEngine << std::endl;
+    vect2csv(destination + "digicall_vibrato_delta", *vibratoDelta);
+    vect2csv(destination + "digicall_vibrato_delta_antithetic", *vibratoDeltaAnti);
+    vect2csv(destination + "digicall_vibrato_vega", *vibratoVega);
+    vect2csv(destination + "digicall_vibrato_vega_antithetic", *vibratoVegaAnti);
+    vect2csv(destination + "digicall_vibrato_rho", *vibratoRho);
+    vect2csv(destination + "digicall_vibrato_rho_antithetic", *vibratoRhoAnti);
 
-	delete vibratoPremium;
-	delete analyticPremium;
-	delete analyticDelta;
-	delete analyticRho;
+    delete vibratoPremium;
+    delete analyticPremium;
+    delete analyticDelta;
+    delete analyticRho;
 
-	delete vibratoDelta;
-	delete vibratoVega;
-	delete vibratoRho;
+    delete vibratoDelta;
+    delete vibratoVega;
+    delete vibratoRho;
 
-	delete vibratoDeltaAntithetic;
-	delete vibratoVegaAntithetic;
-	delete vibratoRhoAntithetic;
+    delete vibratoDeltaAnti;
+    delete vibratoVegaAnti;
+    delete vibratoRhoAnti;
 
-	std::cout << "***** Vibrato for digital options Terminated!" << std::endl;
+    std::cout << "***** Vibrato for digital options Terminated!" << std::endl;
 
-	return 0;
+    return 0;
 }
