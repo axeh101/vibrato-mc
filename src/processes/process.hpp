@@ -25,7 +25,7 @@ public:
 	virtual Path<T> eulerDiscretization(int nsamples, double horizon) {
 		NormalDistribution<T> N = NormalDistribution<T>(0, 1);
 		resetState();
-		Path<T> path = Path<T>(nsamples + 1);
+		Path<T> path = Path<T>(nsamples);
 		path[0] = initialState;
 		double h = horizon / nsamples;
 		for (int i = 1; i <= nsamples; ++i) {
@@ -138,14 +138,20 @@ class TangentProcess : public Process<D>
         }
 
         virtual D sigman(double h) {
-            return this->parent_->diffusion();
+            return this->parent_->diffusion() * sqrt(h);
         }
         
         virtual D dsigman(double h) {
             return this->diffusion() * sqrt(h);
         }
 
+        virtual D vol() const override {
+            return this->parent_->vol();
+        }
 
+        virtual D rate() const override {
+            return this->parent_->rate();
+        }
     protected:
         Process<D>* parent_;
 
