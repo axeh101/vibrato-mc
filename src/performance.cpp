@@ -14,14 +14,14 @@ int main() {
     double rate = .05;
     double vol = .2;
     int n = 25;
-    int Mz = 100;
-    int M = 10000;
+    int Mz = 1;
+    int M = 100;
 
     // Product definition
     VanillaOption<double> callDigital(maturity, strike, OptionType::Call);
 
     // Black Scholes process definition
-    State<double> initialState = {0.0, 100};
+    State<double> initialState = {0.0, 80};
     BlackScholesProcess<double> bs(initialState, rate, vol);
 
     // Pricing engines definition
@@ -29,22 +29,22 @@ int main() {
     auto vibratoEngine = VibratoBS<double>(&callDigital, &bs, n, M, Mz);
 
     // Convergence  tests (Vibrato vs Vibrato antithetic)
-    auto *analyticValue = new Path<double>(1001);
-    auto *vibratoConv = new Path<double>(1001);
-    auto *vibratoAntiConv = new Path<double>(1001);
+    int vecSize = 1000;
+    auto *analyticValue = new Path<double>(vecSize);
+    auto *vibratoConv = new Path<double>(vecSize);
+    auto *vibratoAntiConv = new Path<double>(vecSize);
+
     bsEngine.calculate();
     double delta = bsEngine.delta();
-    for (int i = 0; i < 101; ++i) {
-        vibratoEngine.M += 100;
+    for (int i = 1; i < vecSize + 1; ++i) {
         vibratoEngine.antithetic = false;
         vibratoEngine.calculate();
-        (*analyticValue)[i] = {(double) vibratoEngine.M, delta};
-        (*vibratoConv)[i] = {(double) vibratoEngine.M, vibratoEngine.delta()};
+        (*analyticValue)[i-1] = {(double) M*i, delta};
+        (*vibratoConv)[i-1] = {(double) M*i, vibratoEngine.delta()};
 
         vibratoEngine.antithetic = true;
         vibratoEngine.calculate();
-        (*vibratoAntiConv)[i] = {(double) vibratoEngine.M, vibratoEngine.delta()};
-        std::cout << vibratoEngine.M << std::endl;
+        (*vibratoAntiConv)[i-1] = {(double) M*i, vibratoEngine.delta()};
     }
     vect2csv(destination + "perf_delta_analytic", *analyticValue);
     vect2csv(destination + "perf_delta_vibrato", *vibratoConv);
