@@ -13,6 +13,7 @@
 #include "../processes/tangent/rho.hpp"
 #include "../processes/tangent/vega.hpp"
 
+
 template<typename D>
 class VibratoBS: public PricingEngine<D> {
 
@@ -58,15 +59,15 @@ private:
 		for (int i = 0; i < M; ++i) {
 			this->process_->resetState();
 			for (int i = 0; i < n - 1; ++i) {
-				D Wh = h * normal();
-				this->process_->movePriceEuler(h, Wh);
+				D Z = normal();
+				this->process_->movePriceEuler(h, Z);
 			}
 			// Replication step
 			D value = this->process_->priceState().value;
 			D sigma = this->process_->vol();
 			D subtotal = 0.;
 			D mun = value * (1 + r * h);
-			D sigman = value * sigma;
+			D sigman = value * sigma * sqrt(h);
 			for (int j = 1; j <= Mz; j++) {
 				Z = normal();
 				subtotal += this->option_->payoff(mun + sigman * Z);
@@ -83,10 +84,11 @@ private:
 			this->process_->resetState();
 			deltaTangentProcess.resetState();
 			for (int i = 0; i < n - 1; ++i) {
-				D Wh = h * normal();
-				this->process_->movePriceEuler(h, Wh);
-				deltaTangentProcess.movePriceEuler(h, Wh);
-			}
+				D Z = normal();
+				deltaTangentProcess.movePriceEuler(h, Z);
+                this->process_->movePriceEuler(h, Z);
+
+            }
 			total += _firstOrderVibrato(this->deltaTangentProcess.mun(h),
 					this->deltaTangentProcess.dmun(h),
 					this->deltaTangentProcess.sigman(h),
@@ -101,10 +103,10 @@ private:
 			this->process_->resetState();
 			vegaTangentProcess.resetState();
 			for (int i = 0; i < n - 1; ++i) {
-				D Wh = h * normal();
-				this->process_->movePriceEuler(h, Wh);
-				vegaTangentProcess.movePriceEuler(h, Wh);
-			}
+				D Z = normal();
+				vegaTangentProcess.movePriceEuler(h, Z);
+                this->process_->movePriceEuler(h, Z);
+            }
 			total += _firstOrderVibrato(this->vegaTangentProcess.mun(h),
 					this->vegaTangentProcess.dmun(h),
 					this->vegaTangentProcess.sigman(h),
@@ -119,9 +121,9 @@ private:
 			this->process_->resetState();
 			rhoTangentProcess.resetState();
 			for (int i = 0; i < n - 1; ++i) {
-				D Wh = h * normal();
-				this->process_->movePriceEuler(h, Wh);
-				rhoTangentProcess.movePriceEuler(h, Wh);
+                D Z = normal();
+                rhoTangentProcess.movePriceEuler(h, Z);
+                this->process_->movePriceEuler(h, Z);
 			}
 			total += _firstOrderVibrato(this->rhoTangentProcess.mun(h),
 					this->rhoTangentProcess.dmun(h),
@@ -160,7 +162,7 @@ private:
 			for (int j = 1; j <= Mz; j++) {
 				Z = normal();
 				payoff = this->option_->payoff(mun + sigman * Z);
-				espmu += Z * payoff / sigman;
+				espmu += Z * payoff / (sigman);
 				espsigma += 0.5 * (Z * Z - 1) * payoff / (sigman * sigman);
 			}
 		}
