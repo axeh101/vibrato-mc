@@ -25,7 +25,7 @@ public:
 	virtual Path<T> eulerDiscretization(int nsamples, double horizon) {
 		NormalDistribution<T> N = NormalDistribution<T>(0, 1);
 		resetState();
-		Path<T> path = Path<T>(nsamples);
+		Path<T> path = Path<T>(nsamples+1);
 		path[0] = initialState;
 		double h = horizon / nsamples;
 		for (int i = 1; i <= nsamples; ++i) {
