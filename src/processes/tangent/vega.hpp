@@ -12,6 +12,7 @@ public:
 		this->vol_ = parent->vol();
 		this->rate_ = parent->rate();
 	}
+    virtual~VegaTangent() = default;
 
 	virtual T drift() const override {
 		return this->parent_->diffDriftVega()
