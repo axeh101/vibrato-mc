@@ -20,14 +20,6 @@ public:
 	virtual T diffusion() const override {
 		return this->parent_->diffDiffusionX() * this->priceState_.value;
 	}
-
-	virtual T vol() const override {
-		return this->parent_->vol();
-	}
-
-	virtual T rate() const override {
-		return this->parent_->rate();
-	}
 };
 
 #endif  // DELTA_HPP
