@@ -96,20 +96,21 @@ public:
 	 */
     virtual T diffDriftX()  const {return 0;}
 
+    /**
+     * computes d²b(theta, Xkn)/dxdsigma
+     */
+    virtual T diffDriftVanna()  const {return 0;}
+
 	/**
 	 * computes dsigma(theta, Xkn)/dx
 	 */
     virtual T diffDiffusionX() const {return 0;}
 
 	/**
-	 * computes d²b(theta, Xkn)/dx²
+	 * computes d²sigma(theta, Xkn)/dxdsigma
 	 */
-    virtual T diffDriftX2()  const {return 0;}
+    virtual T diffDiffusionVanna()  const {return 0;}
 
-	/**
-	 * computes d²sigma(theta, Xkn)/dx²
-	 */
-    virtual T diffDiffusionX2() const {return 0;}
 
 protected:
 	T rate_;
