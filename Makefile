@@ -9,12 +9,13 @@ VERSION := 1.0
 CC := g++
 MAIN := 
 # FLAGS
-CFLAGS :=  -Wall -std=c++14 
+CFLAGS :=  -Wall -std=c++17
 BINDIR := bin
 # PREREQUISITES & STUFFS
 
 all:
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-main $(CFLAGS) src/main.cpp
+	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-ad $(CFLAGS) src/vibrato_ad.cpp
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-digital $(CFLAGS) src/vibrato_digital.cpp
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-vanilla $(CFLAGS) src/vibrato_vanilla.cpp
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-performances $(CFLAGS) src/performance.cpp
@@ -35,6 +36,12 @@ heston:
 
 main:
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-main $(CFLAGS) src/main.cpp
+
+autodiff:
+	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-autodiff $(CFLAGS) src/autodiff_test.cpp
+
+vibrato-ad:
+	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-ad $(CFLAGS) src/vibrato_ad.cpp
 
 clean:
 	rm -rf $(BINDIR)/vibrato-*
