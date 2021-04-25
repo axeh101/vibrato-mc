@@ -4,16 +4,16 @@
 #include "generator.hpp"
 #include <random>
 
-class MersenneTwister final: public Generator<std::mt19937_64>
-{
+class MersenneTwister final : public Generator<std::mt19937_64> {
 public:
-    MersenneTwister()=default;
-    virtual~MersenneTwister()=default;
+    MersenneTwister() = default;
 
-    std::mt19937_64 operator()(){
+    virtual~MersenneTwister() = default;
+
+    std::mt19937_64 operator()() {
         std::random_device rd;
         auto seed = rd();
-        std::mt19937_64 gen(seed); 
+        std::mt19937_64 gen(seed);
         return gen;
     }
 };

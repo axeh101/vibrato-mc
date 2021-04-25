@@ -4,7 +4,7 @@
 #include "../process.hpp"
 
 template<typename T>
-class ThetaTangent: public TangentProcess<T> {
+class ThetaTangent : public TangentProcess<T> {
 
 public:
     ThetaTangent(State<T> initialState, Process<T> *parent) :
@@ -12,7 +12,9 @@ public:
         this->vol_ = parent->vol();
         this->rate_ = parent->rate();
     }
+
     virtual~ThetaTangent() = default;
+
     virtual T drift() const override {
         return this->parent_->diffDriftX() * this->priceState_.value;
     }
