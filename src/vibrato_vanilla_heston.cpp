@@ -33,7 +33,7 @@ int main() {
     BlackScholesProcess<double> bs(initialState, rate, vol);
 
     // Pricing engines definition
-    auto ve = VibratoBS<double>(&call, &bs, n, M, Mz);
+    auto ve = Vibrato<double>(&call, &bs, n, M, Mz);
     auto be = AnalyticalDigitalBS<double>(&call, &bs);
 
     double vecSize = 200;

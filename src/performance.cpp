@@ -26,7 +26,7 @@ int main() {
 
     // Pricing engines definition
     auto bsEngine = AnalyticalVanillaBS<double>(&callDigital, &bs);
-    auto vibratoEngine = VibratoBS<double>(&callDigital, &bs, n, M, Mz);
+    auto vibratoEngine = Vibrato<double>(&callDigital, &bs, n, M, Mz);
 
     // Convergence  tests (Vibrato vs Vibrato antithetic)
     int vecSize = 1000;
