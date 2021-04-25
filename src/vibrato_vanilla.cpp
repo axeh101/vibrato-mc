@@ -28,7 +28,7 @@ int main() {
     auto bsEngine = AnalyticalVanillaBS<double>(&callVanilla, &bs);
     auto vibratoEngine = Vibrato<double>(&callVanilla, &bs, n, M, Mz);
 
-    int vecSize = 200;
+    int vecSize = 100;
     // Premium tests
     auto *vibratoPremium = new Path<double>(vecSize);
     auto *analyticPremium = new Path<double>(vecSize);
@@ -90,12 +90,12 @@ int main() {
         (*vibratoDelta)[i] = {price, vibratoEngine.delta()};
         (*vibratoVega)[i] = {price, vibratoEngine.vega()};
         (*vibratoRho)[i] = {price, vibratoEngine.rho()};
-        (*vibratoThetaAnti)[i] = {price, vibratoEngine.theta()};
-        (*vibratoGammaAnti)[i] = {price, vibratoEngine.gamma()};
-        (*vibratoVannaAnti)[i] = {price, vibratoEngine.vanna()};
+        (*vibratoTheta)[i] = {price, vibratoEngine.theta()};
+        (*vibratoGamma)[i] = {price, vibratoEngine.gamma()};
+        (*vibratoVanna)[i] = {price, vibratoEngine.vanna()};
 
 
-        price += 0.5;
+        price += 1;
     }
 
     vect2csv(destination + "call_analytic_premium", *analyticPremium);
