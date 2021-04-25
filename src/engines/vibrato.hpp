@@ -30,11 +30,11 @@ public:
     virtual ~VibratoBS() = default;
 
     virtual void calculate() override {
-        this->premium_ = _premium();
-        this->delta_ = _delta();
-        this->vega_ = _vega();
-        this->rho_ = _rho() - T * this->premium_;
-        this->theta_ = _theta() + this->process_->rate() * this->premium_;
+//        this->premium_ = _premium();
+//        this->delta_ = _delta();
+//        this->vega_ = _vega();
+//        this->rho_ = _rho() - T * this->premium_;
+//        this->theta_ = _theta() + this->process_->rate() * this->premium_;
         this->vanna_ = _vanna();
         this->gamma_ = _gamma();
 
@@ -45,6 +45,8 @@ private:
     VegaTangent<D> vegaTangentProcess = VegaTangent<D>({this->process_->initialState.time, 0}, this->process_);
     RhoTangent<D> rhoTangentProcess = RhoTangent<D>({this->process_->initialState.time, 0}, this->process_);
     ThetaTangent<D> thetaTangentProcess = ThetaTangent<D>({this->process_->initialState.time, 0}, this->process_);
+    VannaTangent<D> vannaTangentProcess = VannaTangent<D>({this->process_->initialState.time, 0},
+                                                          &deltaTangentProcess, &vegaTangentProcess);
 
     NormalDistribution<D> normal = NormalDistribution<D>(0, 1);
     double T;
@@ -160,15 +162,39 @@ private:
                 this->process_->movePriceEuler(h, Z);
             }
             total += _secondOrderVibrato(this->deltaTangentProcess.mun(h),
-                                        this->deltaTangentProcess.dmun(h),
-                                        this->deltaTangentProcess.sigman(h),
-                                        this->deltaTangentProcess.dsigman(h));
+                                         this->deltaTangentProcess.sigman(h),
+                                         this->deltaTangentProcess.dmun(h),
+                                         this->deltaTangentProcess.dsigman(h),
+                                         this->deltaTangentProcess.dmun(h),
+                                         this->deltaTangentProcess.dsigman(h));
         }
         return exp(-this->process_->rate() * T) * total / M;
     }
 
     virtual D _vanna() {
-        return 0;
+        D total = 0.;
+        for (int i = 0; i < M; ++i) {
+            this->process_->resetState();
+            deltaTangentProcess.resetState();
+            vegaTangentProcess.resetState();
+            vannaTangentProcess.resetState();
+            for (int i = 0; i < n - 1; ++i) {
+                D Z = normal();
+                vannaTangentProcess.movePriceEuler(h, Z);
+                vegaTangentProcess.movePriceEuler(h, Z);
+                deltaTangentProcess.movePriceEuler(h, Z);
+                this->process_->movePriceEuler(h, Z);
+            }
+            total += _secondOrderVibrato(this->deltaTangentProcess.mun(h),
+                                         this->deltaTangentProcess.sigman(h),
+                                         this->deltaTangentProcess.dmun(h),
+                                         this->deltaTangentProcess.dsigman(h),
+                                         this->vegaTangentProcess.mun(h),
+                                         this->vegaTangentProcess.sigman(h),
+                                         this->vannaTangentProcess.mun(h),
+                                         this->vannaTangentProcess.sigman(h));
+        }
+        return exp(-this->process_->rate() * T) * total / M;
     }
 
     D _firstOrderVibrato(D mun, D dmun, D sigman, D dsigman) {
@@ -200,41 +226,52 @@ private:
 
     }
 
-    D _secondOrderVibrato(D mun, D dmun, D sigman, D dsigman) {
+    D _secondOrderVibrato(D mun, D sigman, D mun1, D sigman1, D mun2, D sigman2, D mun12 = 0, D sigman12 = 0) {
+
+        D espMuMu = 0;
+        D espMu2 = 0;
+
+        D espSigmaSigma = 0;
+        D espSigma2 = 0;
+        D espMuSigma = 0;
+
         D Z;
-        D espmusq = 0;
-        D espsigmasq = 0;
-        D espmusigma = 0;
         D Z2;
         D Z4;
+
         if (antithetic) {
             D payoffPlus;
             D payoffMinus;
             D payoffMu;
             for (int j = 0; j < Mz; j++) {
                 Z = normal();
-                Z2 = Z*Z;
+                Z2 = Z * Z;
                 Z4 = Z2 * Z2;
                 payoffPlus = this->option_->payoff(mun + sigman * Z);
                 payoffMinus = this->option_->payoff(mun - sigman * Z);
                 payoffMu = this->option_->payoff(mun);
-                espmusq += (Z2 - 1) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman * sigman);
-                espsigmasq += (Z4 - 5 * Z2 + 2) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman * sigman);
-                espmusigma += Z*(Z2 - 3) * (payoffPlus - payoffMinus) / (sigman * sigman);
+                espMuMu += (Z2 - 1) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman * sigman);
+                espSigmaSigma += (Z4 - 5 * Z2 - 2) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman * sigman);
+                espMuSigma += Z * (Z2 - 3) * (payoffPlus - payoffMinus) / (sigman * sigman);
+                espMu2 += Z * (payoffPlus - payoffMinus) / (2 * sigman);
+                espSigma2 += (Z2 - 1) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman);
             }
         } else {
             D payoff;
             for (int j = 0; j < Mz; j++) {
                 Z = normal();
-                Z2 = Z*Z;
+                Z2 = Z * Z;
                 Z4 = Z2 * Z2;
                 payoff = this->option_->payoff(mun + sigman * Z);
-                espmusq += (Z2 - 1) * payoff / (sigman * sigman);
-                espsigmasq += (Z4 - 5 * Z2 + 2) * payoff / (sigman * sigman);
-                espmusigma += Z*(Z2 - 3) * payoff / (sigman * sigman);
+                espMuMu += (Z2 - 1) * payoff / (sigman * sigman);
+                espSigmaSigma += (Z4 - 5 * Z2 + 2) * payoff / (sigman * sigman);
+                espMuSigma += Z * (Z2 - 3) * payoff / (sigman * sigman);
+                espMu2 += Z * payoff / sigman;
+                espSigma2 += (Z2 - 1) * payoff / sigman;
             }
         }
-        return (dmun * dmun * espmusq +  dsigman * dsigman * espsigmasq + 2 * dsigman * dmun * espmusigma ) / Mz;
+        return (mun1 * mun2 * espMuMu + sigman1 * sigman2 * espSigmaSigma + mun12 * espMu2 + sigman12 * espSigma2 +
+                (sigman1 * mun2 + sigman2 * mun1) * espMuSigma) / Mz;
 
     }
 };
