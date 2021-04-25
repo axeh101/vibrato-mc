@@ -8,153 +8,164 @@ template<typename T>
 class Process {
 
 public:
-	State<T> initialState;
+    State<T> initialState;
 
-	virtual ~Process() = default;
-	Process(State<T> &initialState, std::string name) :
-			initialState(initialState), priceState_(initialState), name_(name) {
-	}
+    virtual ~Process() = default;
 
-	virtual T drift() const = 0;
-	virtual T diffusion() const = 0;
+    Process(State<T> &initialState, std::string name) :
+            initialState(initialState), priceState_(initialState), name_(name) {
+    }
 
-	virtual T eulerPriceDiff(double h, T Wh) {
-		return drift() * h + diffusion() * sqrt(h) * Wh;
-	}
+    virtual T drift() const = 0;
 
-	virtual Path<T> eulerDiscretization(int nsamples, double horizon) {
-		NormalDistribution<T> N = NormalDistribution<T>(0, 1);
-		resetState();
-		Path<T> path = Path<T>(nsamples+1);
-		path[0] = initialState;
-		double h = horizon / nsamples;
-		for (int i = 1; i <= nsamples; ++i) {
-			path[i] = movePriceEuler(h, N());
-		}
-		return path;
+    virtual T diffusion() const = 0;
 
-	}
+    virtual T eulerPriceDiff(double h, T Wh) {
+        return drift() * h + diffusion() * sqrt(h) * Wh;
+    }
 
-	virtual State<T> nextPriceEuler(double h, T Wh) {
-		return {
-			priceState_.time + h,
-			priceState_.value + eulerPriceDiff(h, Wh),
-		};
-	}
+    virtual Path<T> eulerDiscretization(int nsamples, double horizon) {
+        NormalDistribution<T> N = NormalDistribution<T>(0, 1);
+        resetState();
+        Path<T> path = Path<T>(nsamples + 1);
+        path[0] = initialState;
+        double h = horizon / nsamples;
+        for (int i = 1; i <= nsamples; ++i) {
+            path[i] = movePriceEuler(h, N());
+        }
+        return path;
 
-	virtual State<T> movePriceEuler(double h, T Wh) {
-		this->priceState_ = this->nextPriceEuler(h, Wh);
-		return this->priceState_;
-	}
+    }
 
-	virtual void resetState() {
-		priceState_ = initialState;
-	}
+    virtual State<T> nextPriceEuler(double h, T Wh) {
+        return {
+                priceState_.time + h,
+                priceState_.value + eulerPriceDiff(h, Wh),
+        };
+    }
 
-	virtual State<T> priceState() {
-		return priceState_;
-	}
+    virtual State<T> movePriceEuler(double h, T Wh) {
+        this->priceState_ = this->nextPriceEuler(h, Wh);
+        return this->priceState_;
+    }
 
+    virtual void resetState() {
+        priceState_ = initialState;
+    }
 
-	friend std::ostream& operator<<(std::ostream &o, const Process<T> &opt) {
-		return opt.describe(o);
-	}
-
-	virtual std::ostream& describe(std::ostream &o) const {
-		return o << "Process name: " << name_ << std::endl << "Initial State: "
-				<< initialState << std::endl << "Price State: " << priceState_ << std::endl;
-
-	}
-
-	virtual T vol() const =0;
-	virtual T rate() const = 0;
+    virtual State<T> priceState() {
+        return priceState_;
+    }
 
 
-	/**
-	 * computes db(theta, Xkn)/dsigma
-	 */
-    virtual T diffDriftVega()  const {return 0;}
+    friend std::ostream &operator<<(std::ostream &o, const Process<T> &opt) {
+        return opt.describe(o);
+    }
 
+    virtual std::ostream &describe(std::ostream &o) const {
+        return o << "Process name: " << name_ << std::endl << "Initial State: "
+                 << initialState << std::endl << "Price State: " << priceState_ << std::endl;
 
-	/**
-	 * computes db(theta, Xkn)/dr
-	 */
-    virtual T diffDriftRho()  const {return 0;}
+    }
 
-	/**
-	 * computes dsigma(theta, Xkn)/dsigma
-	 */
-    virtual T diffDiffusionVega() const {return 0;}
+    virtual T vol() const = 0;
 
-	/**
-	 * computes dsigma(theta, Xkn)/dr
-	 */
-    virtual T diffDiffusionRho() const {return 0;}
+    virtual T rate() const = 0;
 
-	/**
-	 * computes db(theta, Xkn)/dx
-	 */
-    virtual T diffDriftX()  const {return 0;}
 
     /**
-     * computes d²b(theta, Xkn)/dxdsigma
+     * computes db(theta, Xkn)/dsigma
      */
-    virtual T diffDriftVanna()  const {return 0;}
+    virtual T diffDriftVega() const { return 0; }
 
-	/**
-	 * computes dsigma(theta, Xkn)/dx
-	 */
-    virtual T diffDiffusionX() const {return 0;}
 
-	/**
-	 * computes d²sigma(theta, Xkn)/dxdsigma
-	 */
-    virtual T diffDiffusionVanna()  const {return 0;}
+    /**
+     * computes db(theta, Xkn)/dr
+     */
+    virtual T diffDriftRho() const { return 0; }
 
+    /**
+     * computes dsigma(theta, Xkn)/dsigma
+     */
+    virtual T diffDiffusionVega() const { return 0; }
+
+    /**
+     * computes dsigma(theta, Xkn)/dr
+     */
+    virtual T diffDiffusionRho() const { return 0; }
+
+    /**
+     * computes db(theta, Xkn)/dx
+     */
+    virtual T diffDriftX() const { return 0; }
+
+    /**
+     * computes dsigma(theta, Xkn)/dx
+     */
+    virtual T diffDiffusionX() const { return 0; }
+
+    /**
+     * computes d²b(theta, Xkn)/dx²
+     */
+    virtual T diffDriftX2() const { return 0; }
+
+    /**
+     * computes d²sigma(theta, Xkn)/dx²
+     */
+    virtual T diffDiffusionX2() const { return 0; }
+
+    /**
+     * computes d²sigma(theta, Xkn)/dxdsigma
+     */
+    virtual T diffDiffusionSigmaX() const { return 0; }
 
 protected:
-	T rate_;
-	T vol_;
-	State<T> priceState_;
-	std::string name_;
+    T rate_;
+    T vol_;
+    State<T> priceState_;
+    std::string name_;
 };
 
-template <typename D>
-class TangentProcess : public Process<D>
-{
-    public:
-        virtual ~TangentProcess() {
-            parent_ = nullptr;
-            delete parent_;
-        }
-        TangentProcess(State<D> initialState, std::string name, Process<D>* parent):
+template<typename D>
+class TangentProcess : public Process<D> {
+public:
+    Process<D> *parent_;
+
+    virtual ~TangentProcess() {
+        parent_ = nullptr;
+        delete parent_;
+    }
+
+    TangentProcess(State<D> initialState, std::string name, Process<D> *parent) :
             Process<D>(initialState, name), parent_(parent) {}
 
-        virtual D mun(double h) {
-            return this->parent_->priceState().value + this->parent_->drift() * h;
-        }
-        
-        virtual D dmun(double h) {
-            return this->priceState_.value + this->drift() * h;
-        }
+    virtual D mun(double h) {
+        return this->parent_->priceState().value + this->parent_->drift() * h;
+    }
 
-        virtual D sigman(double h) {
-            return this->parent_->diffusion() * sqrt(h);
-        }
-        
-        virtual D dsigman(double h) {
-            return this->diffusion() * sqrt(h);
-        }
+    virtual D dmun(double h) {
+        return this->priceState_.value + this->drift() * h;
+    }
 
-        virtual D vol() const override {
-            return this->parent_->vol();
-        }
+    virtual D sigman(double h) {
+        return this->parent_->diffusion() * sqrt(h);
+    }
 
-        virtual D rate() const override {
-            return this->parent_->rate();
-        }
-    protected:
-        Process<D>* parent_;
+    virtual D dsigman(double h) {
+        return this->diffusion() * sqrt(h);
+    }
+
+    virtual D vol() const override {
+        return this->parent_->vol();
+    }
+
+    virtual D rate() const override {
+        return this->parent_->rate();
+    }
+
+    virtual Process<D> *parent() { return this->parent_; }
+
 
 };
+
 #endif  // PROCESS_HPP
