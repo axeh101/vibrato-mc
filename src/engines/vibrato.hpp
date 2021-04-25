@@ -11,7 +11,7 @@
 
 
 template<typename D>
-class VibratoBS : public PricingEngine<D> {
+class Vibrato : public PricingEngine<D> {
 
 public:
     int n;
@@ -20,14 +20,14 @@ public:
     double h;
     bool antithetic = true;
 
-    VibratoBS(Option<D> *option, BlackScholesProcess<D> *process, int n, int M,
+    Vibrato(Option<D> *option, BlackScholesProcess<D> *process, int n, int M,
               int Mz) :
             PricingEngine<D>(option, process), n(n), M(M), Mz(Mz) {
         T = option->maturity();
         h = T / n;
     }
 
-    virtual ~VibratoBS() = default;
+    virtual ~Vibrato() = default;
 
     virtual void calculate() override {
 //        this->premium_ = _premium();
@@ -251,7 +251,7 @@ private:
                 payoffMinus = this->option_->payoff(mun - sigman * Z);
                 payoffMu = this->option_->payoff(mun);
                 espMuMu += (Z2 - 1) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman * sigman);
-                espSigmaSigma += (Z4 - 5 * Z2 - 2) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman * sigman);
+                espSigmaSigma += (Z4 - 5 * Z2 + 2) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman * sigman);
                 espMuSigma += Z * (Z2 - 3) * (payoffPlus - payoffMinus) / (sigman * sigman);
                 espMu2 += Z * (payoffPlus - payoffMinus) / (2 * sigman);
                 espSigma2 += (Z2 - 1) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman);
