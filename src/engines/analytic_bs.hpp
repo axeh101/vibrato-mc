@@ -105,6 +105,7 @@ public:
         this->rho_ = _rho();
         this->theta_ = _theta();
         this->vanna_ = _vanna();
+        this->volga_ = _volga();
     }
 };
 

@@ -18,6 +18,7 @@ protected:
     T vega_;
     T rho_;
     T vanna_;
+    T volga_;
     T premium_;
 
 public:
@@ -59,7 +60,7 @@ public:
     virtual T theta() { return theta_; };
 
     virtual T vanna() { return vanna_; };
-
+    virtual T volga() { return volga_; };
     virtual T premium() { return premium_; };
 
     virtual void calculate() = 0;
