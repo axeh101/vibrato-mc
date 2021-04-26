@@ -24,12 +24,10 @@ int main(void) {
     DigitalOption<double> dput(maturity, strike, OptionType::Call);
 
 
-
     cout << "***********Pricing results**********" << endl;
     State<double> initialState = {0.0, price};
     // Black Scholes
     BlackScholesProcess<double> bs(initialState, rate, vol);
-
 
 
     auto bsEngine = AnalyticalVanillaBS<double>(&vcall, &bs);
