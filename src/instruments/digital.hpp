@@ -1,7 +1,7 @@
 #ifndef DIGITAL_HPP
 #define DIGITAL_HPP
 
-#include "vanilla.hpp"
+#include "option.hpp"
 
 
 template<typename T=double>
@@ -16,6 +16,15 @@ public:
     T payoff(T price) const override {
         return (this->type_ * (price - this->strike_) > 0.0);
     }
+
+    dual payoff(dual price) const override {
+        dual val = price - this->strike_;
+        if (this->type_ == OptionType::Call) {
+            return val > 0;
+        }
+        return val < 0;
+    }
+
 };
 
 #endif  // DIGITAL_HPP

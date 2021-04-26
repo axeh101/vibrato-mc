@@ -2,11 +2,9 @@
 #define OPTION_HPP
 
 #include <iostream>
+#include <autodiff/forward.hpp>
 
-
-enum ExerciceType {
-    European, American
-};
+using namespace autodiff;
 enum OptionType {
     Call = 1, Put = -1
 };
@@ -21,7 +19,14 @@ public:
 
     virtual T payoff(T price) const = 0;
 
+    // Specific payoff for automatic differentiation using autodiff
+    // using dual in as a template parameter generates a lot of errors
+    // this is a hacky way to get the job done without much trouble.
+    virtual dual payoff(dual price) const = 0;
+
     double maturity() const { return maturity_; };
+
+    std::string name() const { return name_; };
 
     const OptionType &type() const { return type_; }
 
