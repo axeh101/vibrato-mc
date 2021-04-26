@@ -45,6 +45,7 @@ public:
                  "Gamma: " << gamma_ << std::endl <<
                  "Vega: " << vega_ << std::endl <<
                  "Vanna: " << vanna_ << std::endl <<
+                 "Volga: " << volga_ << std::endl <<
                  "Rho: " << rho_ << std::endl <<
                  "Theta: " << theta_ << std::endl;
     };
@@ -60,13 +61,19 @@ public:
     virtual T theta() { return theta_; };
 
     virtual T vanna() { return vanna_; };
+
     virtual T volga() { return volga_; };
+
     virtual T premium() { return premium_; };
 
     virtual void calculate() = 0;
 
-    virtual void changeOption(Option<T> *option) {
-        option_ = option;
+    virtual void changeOption(Option<T> &option) {
+        option_ = &option;
+    }
+
+    virtual void changeProcess(Process<T> &process) {
+        process_ = &process;
     }
 
 
