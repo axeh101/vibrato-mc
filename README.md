@@ -16,7 +16,7 @@ sensitivities of financial options
 
 ## Prérequis
 
-Pour la différentiation automatique, on utilise la librairie `autodiff`. Pour l'installer on procède comme suit:
+Pour la différentiation automatique, on utilise la librairie `autodiff`. Ci-dessous les étapes d'installation:
 
 1. Téléchargement de la librairie:
    
@@ -27,9 +27,10 @@ Pour la différentiation automatique, on utilise la librairie `autodiff`. Pour l
    - En téléchargeant directement le fichier zip [ici](https://github.com/autodiff/autodiff/archive/master.zip).
 
 2. Installation de la librairie:
-Cela requière des droits administrateurs, pour l'installer localement, il suffit de remplacer dans la commande 
-   ci-dessous `cmake ..` par `-DCMAKE_INSTALL_PREFIX=directory`, où **directory** correspond a un endroit de votre choix
-   par exemple `-DCMAKE_INSTALL_PREFIX=~/.local`
+Cela requière des droits administrateurs. Il est aussi possible d'installer la librarie localement, il suffit de 
+   remplacer dans les commandes ci-dessous `cmake ..` par `cmake .. -DCMAKE_INSTALL_PREFIX=directory`, 
+   où _"directory"_ correspond a un endroit de votre choix
+   par exemple `cmake .. -DCMAKE_INSTALL_PREFIX=~/.local`
 ```bash
 mkdir .build && cd .build
 cmake ..
