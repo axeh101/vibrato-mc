@@ -34,16 +34,13 @@ int main() {
     auto *vibratoConv = new Path<double>(vecSize);
     auto *vibratoAntiConv = new Path<double>(vecSize);
 
-    bsEngine.calculate();
     double delta = bsEngine.delta();
     for (int i = 1; i < vecSize + 1; ++i) {
         vibratoEngine.antithetic = false;
-        vibratoEngine.calculate();
         (*analyticValue)[i - 1] = {(double) M * i, delta};
         (*vibratoConv)[i - 1] = {(double) M * i, vibratoEngine.delta()};
 
         vibratoEngine.antithetic = true;
-        vibratoEngine.calculate();
         (*vibratoAntiConv)[i - 1] = {(double) M * i, vibratoEngine.delta()};
     }
     vect2csv(destination + "perf_delta_analytic", *analyticValue);
