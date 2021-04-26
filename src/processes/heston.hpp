@@ -47,10 +47,10 @@ public:
         return this->rate_;
     }
 
-    virtual State<T> movePriceEuler(double h, T Wh) {
-        this->priceState_ = this->nextPriceEuler(h, Wh);
-        T Bh = Wh * correlation_ + sqrt(1 - correlation_ * correlation_) * normal();
-        this->volProcess_->movePriceEuler(h, Bh);
+    virtual State<T> movePriceEuler(double h, T Z) {
+        T ZS = Z * correlation_ + sqrt(1 - correlation_ * correlation_) * normal();
+        this->priceState_ = this->nextPriceEuler(h, ZS);
+        this->volProcess_->movePriceEuler(h, Z);
         return this->priceState_;
     }
 
@@ -78,8 +78,7 @@ public:
         return Process<T>::describe(o) <<
                                        "Rate: " << this->rate_ << std::endl <<
                                        "Volatility: " << *this->volProcess_ << std::endl <<
-                                       "Correlation:" << correlation_ << std::endl <<
-                                       std::endl;
+                                       "Correlation:" << correlation_ << std::endl;
     }
 };
 
