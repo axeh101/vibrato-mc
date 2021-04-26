@@ -7,7 +7,6 @@
 // Instruments
 #include "instruments/digital.hpp"
 #include "instruments/vanilla.hpp"
-#include "instruments/helper.hpp"
 
 // Random numbers
 #include "random/mersenne.hpp"

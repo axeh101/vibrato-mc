@@ -2,7 +2,6 @@
 #define ENGINE_HPP
 
 #include <iostream>
-#include "../instruments/helper.hpp"
 #include "../instruments/option.hpp"
 #include "../processes/process.hpp"
 
