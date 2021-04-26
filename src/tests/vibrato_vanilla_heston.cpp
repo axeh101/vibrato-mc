@@ -1,5 +1,5 @@
 #include <iostream>
-#include "all.hpp"
+#include "../all.hpp"
 
 using namespace std;
 
@@ -13,7 +13,7 @@ int main() {
     double strike = 90;
     double rate = .00135;
     int n = 100;
-    int M = 10000;
+    int M = 100000;
     int Mz = 2;
     double vol = .2;
     // Heston params
@@ -89,8 +89,10 @@ int main() {
 
     vect2csv(destination + "call_heston_vibrato_delta", *vibratoDelta);
     vect2csv(destination + "call_heston_vibrato_delta_antithetic", *vibratoDeltaAntithetic);
+
     vect2csv(destination + "call_heston_vibrato_vega", *vibratoVega);
     vect2csv(destination + "call_heston_vibrato_vega_antithetic", *vibratoVegaAntithetic);
+
     vect2csv(destination + "call_heston_vibrato_rho", *vibratoRho);
     vect2csv(destination + "call_heston_vibrato_rho_antithetic", *vibratoRhoAntithetic);
 

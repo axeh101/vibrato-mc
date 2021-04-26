@@ -1,5 +1,5 @@
 #include <iostream>
-#include "all.hpp"
+#include "../all.hpp"
 
 using namespace std;
 
