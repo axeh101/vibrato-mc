@@ -32,8 +32,7 @@ int main(void) {
 
     auto bsEngine = AnalyticalVanillaBS<double>(&vcall, &bs);
     auto vbEngine = Vibrato<double>(&vcall, &bs, n, M, Mz);
-    bsEngine.calculate();
-    vbEngine.calculate();
+
     cout << "Call Black-Scholes **************" << endl;
     cout << bsEngine << endl;
     cout << "Call Vibrato ********************" << endl;
@@ -43,8 +42,7 @@ int main(void) {
     bsEngine.changeOption(dput);
     vbEngine.changeProcess(bs);
     vbEngine.changeOption(dput);
-    vbEngine.calculate();
-    bsEngine.calculate();
+
     bs.resetState();
 
     cout << "Put Black-Scholes **************" << endl;
