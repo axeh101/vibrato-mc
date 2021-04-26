@@ -8,6 +8,70 @@
 
 template<typename D>
 class AnalyticalVanillaBS : public PricingEngine<D> {
+
+public:
+    AnalyticalVanillaBS(Option<D> *option, BlackScholesProcess<D> *process) : PricingEngine<D>(option, process) {};
+
+    virtual~AnalyticalVanillaBS() = default;
+
+    virtual D premium() override {
+        setParams();
+        if (this->option_->type() == OptionType::Call) {
+            return S * nd1 - K * ract * nd2;
+        } else {
+            return S * (nd1 - 1) + ract * K * (1 - nd2);
+        }
+    }
+
+    virtual D delta() override {
+        setParams();
+        if (this->option_->type() == OptionType::Call) {
+            return nd1;
+        } else {
+            return nd1 - 1;
+        }
+    }
+
+    virtual D gamma() override {
+        setParams();
+        return pd1 / (S * sigma * sqrt(T));
+    }
+
+    virtual D vega() override {
+        setParams();
+        return S * pd1 * sqrt(T);
+    }
+
+    virtual D rho() override {
+        setParams();
+        if (this->option_->type() == OptionType::Call) {
+            return K * T * ract * nd2;
+        } else {
+            return K * T * ract * (nd2 - 1);
+        }
+
+    }
+
+    virtual D theta() override {
+        setParams();
+        if (this->option_->type() == OptionType::Call) {
+            return -S * pd1 * sigma / (2 * sqrt(T)) - r * K * ract * nd2;
+        } else {
+            return -S * pd1 * sigma / (2 * sqrt(T)) + r * K * ract * (1 - nd2);
+        }
+    }
+
+    virtual D vanna() override {
+        setParams();
+        return -pd1 * d2 / sigma;
+
+    }
+
+    virtual D volga() override {
+        setParams();
+        return S * sqrt(T) * pd1 * d1 * d2 / (sigma);
+    }
+
 private:
     NormalDistribution<D> normal = NormalDistribution<D>(0, 1);
     D S;
@@ -36,75 +100,7 @@ private:
         pd1 = normal.pdf(d1);
     }
 
-    virtual D _rho() const {
-        if (this->option_->type() == OptionType::Call) {
-            return K * T * ract * nd2;
-        } else {
-            return K * T * ract * (nd2 - 1);
-        }
 
-    }
-
-    virtual D _vega() const {
-        return S * pd1 * sqrt(T);
-    }
-
-    virtual D _delta() const {
-        if (this->option_->type() == OptionType::Call) {
-            return nd1;
-        } else {
-            return nd1 - 1;
-        }
-    }
-
-    virtual D _gamma() const {
-        return pd1 / (S * sigma * sqrt(T));
-    }
-
-    virtual D _theta() const {
-        if (this->option_->type() == OptionType::Call) {
-            return -S * pd1 * sigma / (2 * sqrt(T)) - r * K * ract * nd2;
-        } else {
-            return -S * pd1 * sigma / (2 * sqrt(T)) + r * K * ract * (1 - nd2);
-        }
-    }
-
-    virtual D _vanna() const {
-        return -pd1 * d2 / sigma;
-
-    }
-
-    virtual D _volga() const {
-        return S * sqrt(T) * pd1 * d1 * d2 / (sigma);
-    }
-
-    virtual D _premium() {
-        if (this->option_->type() == OptionType::Call) {
-            return S * nd1 - K * ract * nd2;
-        } else {
-            return S * (nd1 - 1) + ract * K * (1 - nd2);
-        }
-    }
-
-public:
-    AnalyticalVanillaBS(Option<D> *option, BlackScholesProcess<D> *process)
-            : PricingEngine<D>(option, process) {
-        setParams();
-    };
-
-    virtual~AnalyticalVanillaBS() = default;
-
-    virtual void calculate() override {
-        setParams();
-        this->premium_ = _premium();
-        this->delta_ = _delta();
-        this->gamma_ = _gamma();
-        this->vega_ = _vega();
-        this->rho_ = _rho();
-        this->theta_ = _theta();
-        this->vanna_ = _vanna();
-        this->volga_ = _volga();
-    }
 };
 
 

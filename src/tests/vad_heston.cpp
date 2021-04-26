@@ -41,28 +41,20 @@ int main() {
 
     // gamma tests
     auto *vibratoGamma = new Path<double>(vecSize);
-    auto *analyticGamma = new Path<double>(vecSize);
     auto *vibratoGammaAnti = new Path<double>(vecSize);
 
     // vanna tests
     auto *vibratoVanna = new Path<double>(vecSize);
-    auto *analyticVanna = new Path<double>(vecSize);
     auto *vibratoVannaAnti = new Path<double>(vecSize);
 
     // volga tests
     auto *vibratoVolga = new Path<double>(vecSize);
-    auto *analyticVolga = new Path<double>(vecSize);
     auto *vibratoVolgaAnti = new Path<double>(vecSize);
 
 
     double price = 60;
     for (int i = 0; i < vecSize; ++i) {
         bs.initialState.value = price;
-        bsEngine.calculate();
-
-        (*analyticGamma)[i] = {price, bsEngine.gamma()};
-        (*analyticVanna)[i] = {price, bsEngine.vanna()};
-        (*analyticVolga)[i] = {price, bsEngine.volga()};
 
         vibratoEngine.antithetic = true;
         (*vibratoGammaAnti)[i] = {price, vibratoEngine.gamma()};
@@ -77,26 +69,29 @@ int main() {
         price += 0.5;
     }
 
-    vect2csv(destination + "call_analytic_heston_vanna", *analyticVanna);
+//    vect2csv(destination + "call_analytic_heston_vanna", *analyticVanna);
     vect2csv(destination + "call_vibratoad_heston_vanna", *vibratoVanna);
     vect2csv(destination + "call_vibratoad_heston_vanna_antithetic", *vibratoVannaAnti);
 
-    vect2csv(destination + "call_analytic_heston_gamma", *analyticGamma);
+//    vect2csv(destination + "call_analytic_heston_gamma", *analyticGamma);
     vect2csv(destination + "call_vibratoad_heston_gamma", *vibratoGamma);
     vect2csv(destination + "call_vibratoad_heston_gamma_antithetic", *vibratoGammaAnti);
 
-    vect2csv(destination + "call_analytic_heston_volga", *analyticVolga);
+//    vect2csv(destination + "call_analytic_heston_volga", *analyticVolga);
     vect2csv(destination + "call_vibratoad_heston_volga", *vibratoVolga);
     vect2csv(destination + "call_vibratoad_heston_volga_antithetic", *vibratoVolgaAnti);
 
     delete vibratoGamma;
     delete vibratoGammaAnti;
-    delete analyticGamma;
+//    delete analyticGamma;
 
     delete vibratoVanna;
     delete vibratoVannaAnti;
-    delete analyticVanna;
+//    delete analyticVanna;
 
+    delete vibratoVolga;
+    delete vibratoVolgaAnti;
+//    delete analyticVolga;
     std::cout << "***** Vibrato  AD for vanilla (Heston) terminated!" << std::endl;
 
     return 0;

@@ -60,21 +60,18 @@ int main() {
     double price = 60;
     for (int i = 0; i < vecSize; ++i) {
         bs.initialState.value = price;
-        bsEngine.calculate();
         (*analyticPremium)[i] = {price, bsEngine.premium()};
         (*analyticDelta)[i] = {price, bsEngine.delta()};
         (*analyticVega)[i] = {price, bsEngine.vega()};
         (*analyticRho)[i] = {price, bsEngine.rho()};
 
         vibratoEngine.antithetic = true;
-        vibratoEngine.calculate();
         (*vibratoPremium)[i] = {price, vibratoEngine.premium()};
         (*vibratoVegaAntithetic)[i] = {price, vibratoEngine.vega()};
         (*vibratoDeltaAntithetic)[i] = {price, vibratoEngine.delta()};
         (*vibratoRhoAntithetic)[i] = {price, vibratoEngine.rho()};
 
         vibratoEngine.antithetic = false;
-        vibratoEngine.calculate();
         (*vibratoDelta)[i] = {price, vibratoEngine.delta()};
         (*vibratoVega)[i] = {price, vibratoEngine.vega()};
         (*vibratoRho)[i] = {price, vibratoEngine.rho()};

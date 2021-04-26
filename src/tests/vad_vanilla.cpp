@@ -11,18 +11,19 @@ int main() {
     const std::string destination = "src/python/datasets/";
 
     double maturity = .5;
-    double strike = 100;
+    double strike = 70;
+    double price = 30;
     double rate = .05;
     double vol = .2;
-    int n = 25;
-    int M = 1000;
-    int Mz = 10;
+    int n = 100;
+    int M = 10000;
+    int Mz = 100;
 
     // Product definition
     VanillaOption<double> call(maturity, strike, OptionType::Call);
 
     // Black Scholes process definition
-    State<double> initialState = {0.0, 100};
+    State<double> initialState = {0.0, price};
     BlackScholesProcess<double> bs(initialState, rate, vol);
 
     // Pricing engines definition
@@ -47,11 +48,8 @@ int main() {
     auto *vibratoVolgaAnti = new Path<double>(vecSize);
 
 
-    double price = 60;
     for (int i = 0; i < vecSize; ++i) {
         bs.initialState.value = price;
-        bsEngine.calculate();
-
         (*analyticGamma)[i] = {price, bsEngine.gamma()};
         (*analyticVanna)[i] = {price, bsEngine.vanna()};
         (*analyticVolga)[i] = {price, bsEngine.volga()};
@@ -66,7 +64,7 @@ int main() {
         (*vibratoVanna)[i] = {price, vibratoEngine.vanna()};
         (*vibratoVolga)[i] = {price, vibratoEngine.volga()};
 
-        price += 0.5;
+        price += .5;
     }
 
     vect2csv(destination + "call_analytic_vanna", *analyticVanna);

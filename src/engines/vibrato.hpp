@@ -28,38 +28,15 @@ public:
 
     virtual ~Vibrato() = default;
 
-    virtual void calculate() override {
-        this->premium_ = _premium();
-        this->delta_ = _delta();
-        this->vega_ = _vega();
-        this->rho_ = _rho() - T * this->premium_;
-        this->theta_ = _theta() + this->process_->rate() * this->premium_;
-        this->vanna_ = _vanna();
-        this->gamma_ = _gamma();
-
-    }
-
-private:
-    DeltaTangent<D> deltaTangentProcess = DeltaTangent<D>({this->process_->initialState.time, 1}, this->process_);
-    VegaTangent<D> vegaTangentProcess = VegaTangent<D>({this->process_->initialState.time, 0}, this->process_);
-    RhoTangent<D> rhoTangentProcess = RhoTangent<D>({this->process_->initialState.time, 0}, this->process_);
-    ThetaTangent<D> thetaTangentProcess = ThetaTangent<D>({this->process_->initialState.time, 0}, this->process_);
-    VannaTangent<D> vannaTangentProcess = VannaTangent<D>({this->process_->initialState.time, 0},
-                                                          &deltaTangentProcess, &vegaTangentProcess);
-
-    NormalDistribution<D> normal = NormalDistribution<D>(0, 1);
-    double T;
-
-    virtual D _premium() {
+    virtual D premium() override {
         D r = this->process_->rate();
         D total = 0.;
-        D Z;
+
 
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
             for (int i = 0; i < n - 1; ++i) {
-                D Z = normal();
-                this->process_->movePriceEuler(h, Z);
+                this->process_->movePriceEuler(h, normal());
             }
             // Replication step
             D value = this->process_->priceState().value;
@@ -68,8 +45,7 @@ private:
             D mun = value * (1 + r * h);
             D sigman = value * sigma * sqrt(h);
             for (int j = 1; j <= Mz; j++) {
-                Z = normal();
-                subtotal += this->option_->payoff(mun + sigman * Z);
+                subtotal += this->option_->payoff(mun + sigman * normal());
             }
             // End of Replication step
             total += subtotal / Mz;
@@ -77,7 +53,7 @@ private:
         return exp(-r * T) * total / M;
     }
 
-    virtual D _delta() {
+    virtual D delta() override {
         D total = 0.;
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
@@ -96,7 +72,7 @@ private:
         return exp(-this->process_->rate() * T) * total / M;
     }
 
-    virtual D _vega() {
+    virtual D vega() override {
         D total = 0.;
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
@@ -114,7 +90,7 @@ private:
         return exp(-this->process_->rate() * T) * total / M;
     }
 
-    virtual D _rho() {
+    virtual D rho() override {
         D total = 0.;
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
@@ -132,7 +108,7 @@ private:
         return exp(-this->process_->rate() * T) * total / M;
     }
 
-    virtual D _theta() {
+    virtual D theta() override {
         D total = 0.;
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
@@ -150,7 +126,7 @@ private:
         return exp(-this->process_->rate() * T) * total / M;
     }
 
-    virtual D _gamma() {
+    virtual D gamma() override {
         D total = 0.;
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
@@ -170,7 +146,7 @@ private:
         return exp(-this->process_->rate() * T) * total / M;
     }
 
-    virtual D _vanna() {
+    virtual D vanna() override {
         D total = 0.;
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
@@ -195,6 +171,18 @@ private:
         }
         return exp(-this->process_->rate() * T) * total / M;
     }
+
+private:
+    DeltaTangent<D> deltaTangentProcess = DeltaTangent<D>({this->process_->initialState.time, 1}, this->process_);
+    VegaTangent<D> vegaTangentProcess = VegaTangent<D>({this->process_->initialState.time, 0}, this->process_);
+    RhoTangent<D> rhoTangentProcess = RhoTangent<D>({this->process_->initialState.time, 0}, this->process_);
+    ThetaTangent<D> thetaTangentProcess = ThetaTangent<D>({this->process_->initialState.time, 0}, this->process_);
+    VannaTangent<D> vannaTangentProcess = VannaTangent<D>({this->process_->initialState.time, 0},
+                                                          &deltaTangentProcess, &vegaTangentProcess);
+
+    NormalDistribution<D> normal = NormalDistribution<D>(0, 1);
+    double T;
+
 
     D _firstOrderVibrato(D mun, D dmun, D sigman, D dsigman) {
         D Z;

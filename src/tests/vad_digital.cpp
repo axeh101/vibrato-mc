@@ -50,7 +50,6 @@ int main() {
     double price = 60;
     for (int i = 0; i < vecSize; ++i) {
         bs.initialState.value = price;
-        bsEngine.calculate();
 
         (*analyticGamma)[i] = {price, bsEngine.gamma()};
         (*analyticVanna)[i] = {price, bsEngine.vanna()};

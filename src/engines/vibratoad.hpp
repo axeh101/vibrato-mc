@@ -6,7 +6,7 @@
 using namespace autodiff;
 
 template<typename D>
-class VibratoAD {
+class VibratoAD : PricingEngine<D> {
 
 public:
     int n;
@@ -15,8 +15,8 @@ public:
     double h;
     bool antithetic = true;
 
-    VibratoAD(Option<D> *option, BlackScholesProcess<D> *process, int n, int M,
-              int Mz) : n(n), M(M), Mz(Mz), option_(option), process_(process) {
+    VibratoAD(Option<D> *option, BlackScholesProcess<D> *process, int n, int M, int Mz) :
+            PricingEngine<D>(option, process), n(n), M(M), Mz(Mz) {
         T = option->maturity();
         h = T / n;
     }
@@ -32,13 +32,13 @@ public:
                 this->process_->movePriceEuler(h, Z);
             }
             dual X = this->process_->priceState().value;
-            total += derivative([&](auto x) { return this->_f_delta_wrt_price(x); }, wrt(X), at(X)) / Mz;
+            total += derivative([&](auto x) { return this->_f_delta_wrt_price(x); }, wrt(X), at(X));
 
         }
         return exp(-this->process_->rate() * T) * total / M;
     }
 
-    D vanna() {
+    D vanna() override {
         D total = 0;
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
@@ -49,12 +49,12 @@ public:
                 this->process_->movePriceEuler(h, Z);
             }
             dual X = this->process_->priceState().value;
-            total += derivative([&](auto x) { return this->_f_vega_wrt_x(x); }, wrt(X), at(X)) / Mz;
+            total += derivative([&](auto x) { return this->_f_vega_wrt_x(x); }, wrt(X), at(X));
         }
         return exp(-this->process_->rate() * T) * total / M;
     }
 
-    D volga() {
+    D volga() override {
         D total = 0;
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
@@ -65,7 +65,7 @@ public:
                 this->process_->movePriceEuler(h, Z);
             }
             dual X = this->process_->vol();
-            total += derivative([&](auto x) { return this->_f_vega_wrt_sigma(x); }, wrt(X), at(X)) / Mz;
+            total += derivative([&](auto x) { return this->_f_vega_wrt_sigma(x); }, wrt(X), at(X));
         }
         return exp(-this->process_->rate() * T) * total / M;
     }
@@ -107,7 +107,7 @@ private:
                 Z = normal();
                 p = this->option_->payoff(mun + sigman * Z);
                 espmu += Z * p / (sigman);
-                espsigma += 0.5 * (Z * Z - 1) * p / (sigman * sigman);
+                espsigma += (Z * Z - 1) * p / (2 * sigman * sigman);
             }
         }
         return (dmun * espmu + dsigman * espsigma) / Mz;
