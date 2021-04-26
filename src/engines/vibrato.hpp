@@ -20,8 +20,7 @@ public:
     double h;
     bool antithetic = true;
 
-    Vibrato(Option<D> *option, BlackScholesProcess<D> *process, int n, int M,
-              int Mz) :
+    Vibrato(Option<D> *option, BlackScholesProcess<D> *process, int n, int M, int Mz) :
             PricingEngine<D>(option, process), n(n), M(M), Mz(Mz) {
         T = option->maturity();
         h = T / n;
@@ -30,11 +29,11 @@ public:
     virtual ~Vibrato() = default;
 
     virtual void calculate() override {
-//        this->premium_ = _premium();
-//        this->delta_ = _delta();
-//        this->vega_ = _vega();
-//        this->rho_ = _rho() - T * this->premium_;
-//        this->theta_ = _theta() + this->process_->rate() * this->premium_;
+        this->premium_ = _premium();
+        this->delta_ = _delta();
+        this->vega_ = _vega();
+        this->rho_ = _rho() - T * this->premium_;
+        this->theta_ = _theta() + this->process_->rate() * this->premium_;
         this->vanna_ = _vanna();
         this->gamma_ = _gamma();
 
