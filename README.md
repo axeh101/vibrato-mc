@@ -36,7 +36,16 @@ mkdir .build && cd .build
 cmake ..
 cmake --build . --target install
 ```
-Pour plus d'information, consulter le site web [autodiff](https://autodiff.github.io/).
+
+La librairie requière aussi la librairie `eigne3`. Pour l'installer il suffit:
+
+   - Sous MacOs le plus simple est de lancer la commande `brew install eigen`
+   - Sous Linux :
+      - Fedora : `sudo dnf install eigen3-devel` 
+      - Debian : `sudo apt install libeigen3-dev`
+
+Pour plus d'information, consulter le site web [autodiff](https://autodiff.github.io/) et 
+[eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page)
 
 ## Compilation & lancement des programmes
 Un fichier `Makefile` contient toutes les commandes déjà prédéfinies. 
