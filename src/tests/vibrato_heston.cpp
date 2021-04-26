@@ -16,6 +16,7 @@ int main() {
     int M = 100000;
     int Mz = 2;
     double vol = .2;
+
     // Heston params
     double initialVol = 0.028087;
     double correlation = .5;
@@ -34,7 +35,7 @@ int main() {
 
     // Pricing engines definition
     auto ve = Vibrato<double>(&call, &bs, n, M, Mz);
-    auto be = AnalyticalDigitalBS<double>(&call, &bs);
+    auto be = AnalyticalVanillaBS<double>(&call, &bs);
 
     double vecSize = 200;
     // Premium tests
