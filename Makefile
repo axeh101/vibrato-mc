@@ -13,12 +13,12 @@ all:
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-digital $(CFLAGS) $(TESTDIR)/vibrato_digital.cpp
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-vanilla $(CFLAGS) $(TESTDIR)/vibrato_vanilla.cpp
 
-	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-heston $(CFLAGS) $(TESTDIR)/vibrato_vanilla_heston.cpp
+	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-heston $(CFLAGS) $(TESTDIR)/vibrato_heston.cpp
 
-	$(CC) -o $(BINDIR)/$(PROJECT_NAME)ad-digital $(CFLAGS) $(TESTDIR)/vibrato_ad_digital.cpp
-	$(CC) -o $(BINDIR)/$(PROJECT_NAME)ad-vanilla $(CFLAGS) $(TESTDIR)/vibrato_ad_vanilla.cpp
-
-	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-performances $(CFLAGS) $(TESTDIR)/performance.cpp
+	$(CC) -o $(BINDIR)/vad-digital $(CFLAGS) $(TESTDIR)/vibrato_ad_digital.cpp
+	$(CC) -o $(BINDIR)/vad-vanilla $(CFLAGS) $(TESTDIR)/vibrato_ad_vanilla.cpp
+	$(CC) -o $(BINDIR)/vad-heston $(CFLAGS) $(TESTDIR)/vibrato_ad_heston.cpp
+	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-perf $(CFLAGS) $(TESTDIR)/performance.cpp
 
 
 perf:
@@ -31,7 +31,7 @@ vanilla:
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-vanilla $(CFLAGS) $(TESTDIR)/vibrato_vanilla.cpp
 
 heston:
-	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-heston $(CFLAGS) $(TESTDIR)/vibrato_vanilla_heston.cpp
+	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-heston $(CFLAGS) $(TESTDIR)/vibrato_heston.cpp
 
 main:
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-main $(CFLAGS) $(TESTDIR)/main.cpp
@@ -39,10 +39,15 @@ main:
 autodiff:
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-autodiff $(CFLAGS) $(TESTDIR)/autodiff_test.cpp
 
-vibrato-ad-vanilla:
+vanilla-ad:
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)ad-vanilla $(CFLAGS) $(TESTDIR)/vibrato_ad_vanilla.cpp
 
-vibrato-ad-digital:
+digital-ad:
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)ad-digital $(CFLAGS) $(TESTDIR)/vibrato_ad_digital.cpp
+
+heston-ad:
+	$(CC) -o $(BINDIR)/vad-heston $(CFLAGS) $(TESTDIR)/vibrato_ad_heston.cpp
+
+
 clean:
 	rm -rf $(BINDIR)/vibrato-*
