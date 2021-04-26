@@ -64,9 +64,9 @@ make all
 
 3. Compilation et génération des sorties pour la méthode Vibrato avec différentiation automatique :
    
-   - Pour une option vanille exécuter ```make vanilla-ad``` puis `bin/./vibratoad-vanilla`
-   - Pour une option binaire exécuter ```make digital-ad``` puis `bin/./vibratoad-digital`
-   - Pour le modèle de Heston exécuter ```make heston-ad``` puis `bin/./vibratoad-heston`
+   - Pour une option vanille exécuter ```make vanilla-ad``` puis `bin/./vad-vanilla`
+   - Pour une option binaire exécuter ```make digital-ad``` puis `bin/./vad-digital`
+   - Pour le modèle de Heston exécuter ```make heston-ad``` puis `bin/./vad-heston`
    
 
 4. pour les sorties des mesure de performances:
