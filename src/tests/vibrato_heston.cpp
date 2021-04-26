@@ -34,8 +34,8 @@ int main() {
     BlackScholesProcess<double> bs(initialState, rate, vol);
 
     // Pricing engines definition
-    auto ve = Vibrato<double>(&call, &bs, n, M, Mz);
-    auto be = AnalyticalVanillaBS<double>(&call, &bs);
+    auto vibratoEngine = Vibrato<double>(&call, &bs, n, M, Mz);
+    auto bsEngine = AnalyticalVanillaBS<double>(&call, &bs);
 
     double vecSize = 200;
     // Premium tests
@@ -60,24 +60,24 @@ int main() {
     double price = 60;
     for (int i = 0; i < vecSize; ++i) {
         bs.initialState.value = price;
-        be.calculate();
-        (*analyticPremium)[i] = {price, be.premium()};
-        (*analyticDelta)[i] = {price, be.delta()};
-        (*analyticVega)[i] = {price, be.vega()};
-        (*analyticRho)[i] = {price, be.rho()};
+        bsEngine.calculate();
+        (*analyticPremium)[i] = {price, bsEngine.premium()};
+        (*analyticDelta)[i] = {price, bsEngine.delta()};
+        (*analyticVega)[i] = {price, bsEngine.vega()};
+        (*analyticRho)[i] = {price, bsEngine.rho()};
 
-        ve.antithetic = true;
-        ve.calculate();
-        (*vibratoPremium)[i] = {price, ve.premium()};
-        (*vibratoVegaAntithetic)[i] = {price, ve.vega()};
-        (*vibratoDeltaAntithetic)[i] = {price, ve.delta()};
-        (*vibratoRhoAntithetic)[i] = {price, ve.rho()};
+        vibratoEngine.antithetic = true;
+        vibratoEngine.calculate();
+        (*vibratoPremium)[i] = {price, vibratoEngine.premium()};
+        (*vibratoVegaAntithetic)[i] = {price, vibratoEngine.vega()};
+        (*vibratoDeltaAntithetic)[i] = {price, vibratoEngine.delta()};
+        (*vibratoRhoAntithetic)[i] = {price, vibratoEngine.rho()};
 
-        ve.antithetic = false;
-        ve.calculate();
-        (*vibratoDelta)[i] = {price, ve.delta()};
-        (*vibratoVega)[i] = {price, ve.vega()};
-        (*vibratoRho)[i] = {price, ve.rho()};
+        vibratoEngine.antithetic = false;
+        vibratoEngine.calculate();
+        (*vibratoDelta)[i] = {price, vibratoEngine.delta()};
+        (*vibratoVega)[i] = {price, vibratoEngine.vega()};
+        (*vibratoRho)[i] = {price, vibratoEngine.rho()};
 
         price += 0.5;
     }

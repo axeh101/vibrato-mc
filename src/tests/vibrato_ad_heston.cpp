@@ -34,8 +34,8 @@ int main() {
     BlackScholesProcess<double> bs(initialState, rate, vol);
 
     // Pricing engines definition
-    auto ve = VibratoAD<double>(&call, &bs, n, M, Mz);
-    auto be = AnalyticalDigitalBS<double>(&call, &bs);
+    auto vibratoEngine = VibratoAD<double>(&call, &bs, n, M, Mz);
+    auto bsEngine = AnalyticalDigitalBS<double>(&call, &bs);
 
     int vecSize = 200;
 
@@ -96,20 +96,6 @@ int main() {
     delete vibratoVanna;
     delete vibratoVannaAnti;
     delete analyticVanna;
-
-
-    delete vibratoPremium;
-    delete analyticPremium;
-    delete analyticDelta;
-    delete analyticRho;
-
-    delete vibratoDelta;
-    delete vibratoVega;
-    delete vibratoRho;
-
-    delete vibratoDeltaAntithetic;
-    delete vibratoVegaAntithetic;
-    delete vibratoRhoAntithetic;
 
     std::cout << "***** Vibrato  AD for vanilla (Heston) terminated!" << std::endl;
 
