@@ -10,10 +10,11 @@ int main() {
     const std::string destination = "src/python/datasets/";
 
     double maturity = 1;
+    double price = 60;
     double strike = 90;
     double rate = .00135;
     int n = 100;
-    int M = 100000;
+    int M = 1000;
     int Mz = 2;
     double vol = .2;
 
@@ -28,7 +29,7 @@ int main() {
     VanillaOption<double> call(maturity, strike, OptionType::Call);
 
     // Heston & CIR process definition
-    State<double> initialState = {0.0, 60};
+    State<double> initialState = {0.0, price};
     CoxIngersollRossProcess<double> cir({0, initialVol}, kappa, eta, volvol);
     HestonProcess<double> heston(initialState, &cir, rate, correlation);
     BlackScholesProcess<double> bs(initialState, rate, vol);
@@ -57,7 +58,6 @@ int main() {
     auto *analyticRho = new Path<double>(vecSize);
     auto *vibratoRhoAntithetic = new Path<double>(vecSize);
 
-    double price = 60;
     for (int i = 0; i < vecSize; ++i) {
         bs.initialState.value = price;
         (*analyticPremium)[i] = {price, bsEngine.premium()};
@@ -78,19 +78,19 @@ int main() {
 
         price += 0.5;
     }
-    vect2csv(destination + "call_heston_analytic_premium", *analyticPremium);
-    vect2csv(destination + "call_heston_analytic_delta", *analyticDelta);
-    vect2csv(destination + "call_heston_analytic_vega", *analyticVega);
-    vect2csv(destination + "call_heston_analytic_rho", *analyticRho);
 
+    vect2csv(destination + "call_heston_analytic_premium", *analyticPremium);
     vect2csv(destination + "call_heston_vibrato_premium", *vibratoPremium);
 
+    vect2csv(destination + "call_heston_analytic_delta", *analyticDelta);
     vect2csv(destination + "call_heston_vibrato_delta", *vibratoDelta);
     vect2csv(destination + "call_heston_vibrato_delta_antithetic", *vibratoDeltaAntithetic);
 
+    vect2csv(destination + "call_heston_analytic_vega", *analyticVega);
     vect2csv(destination + "call_heston_vibrato_vega", *vibratoVega);
     vect2csv(destination + "call_heston_vibrato_vega_antithetic", *vibratoVegaAntithetic);
 
+    vect2csv(destination + "call_heston_analytic_rho", *analyticRho);
     vect2csv(destination + "call_heston_vibrato_rho", *vibratoRho);
     vect2csv(destination + "call_heston_vibrato_rho_antithetic", *vibratoRhoAntithetic);
 

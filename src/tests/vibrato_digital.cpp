@@ -18,7 +18,7 @@ int main() {
     int Mz = 1;
 
     // Product definition
-    DigitalOption<double> callDigital(maturity, strike, OptionType::Call);
+    DigitalOption<double> callDigital(maturity, strike, OptionType::Put);
 
     // Black Scholes process definition
     State<double> initialState = {0.0, 100};
@@ -87,9 +87,9 @@ int main() {
         (*vibratoDelta)[i] = {price, vibratoEngine.delta()};
         (*vibratoVega)[i] = {price, vibratoEngine.vega()};
         (*vibratoRho)[i] = {price, vibratoEngine.rho()};
-        (*vibratoThetaAnti)[i] = {price, vibratoEngine.theta()};
-        (*vibratoGammaAnti)[i] = {price, vibratoEngine.gamma()};
-        (*vibratoVannaAnti)[i] = {price, vibratoEngine.vanna()};
+        (*vibratoTheta)[i] = {price, vibratoEngine.theta()};
+        (*vibratoGamma)[i] = {price, vibratoEngine.gamma()};
+        (*vibratoVanna)[i] = {price, vibratoEngine.vanna()};
 
 
         price += 0.5;

@@ -44,7 +44,7 @@ public:
 
     virtual D vega() override {
         setParams();
-        return -d1 * pd2 * ract / sigma;
+        return -this->option_->type() * d1 * pd2 * ract / sigma;
     }
 
 
