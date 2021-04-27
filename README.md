@@ -33,6 +33,7 @@ Pour la différentiation automatique, on utilise la librairie `autodiff`. Ci-des
    correspond a un endroit de votre choix par exemple `cmake .. -DCMAKE_INSTALL_PREFIX=~/.local`
 
 ```bash
+cd autodiff
 mkdir .build && cd .build
 cmake ..
 cmake --build . --target install
