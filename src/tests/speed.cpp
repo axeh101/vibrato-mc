@@ -29,7 +29,7 @@ int main() {
     auto vadEngine = VibratoAD<double>(&call, &bs, n, M, Mz);
 
 
-    int vecSize = 50000 - 10;
+    int vecSize = 100;
     auto *vSpeed = new Path<double>(vecSize);
     auto *vadSpeed = new Path<double>(vecSize);
 
@@ -37,40 +37,46 @@ int main() {
     auto *vadSpeedAnti = new Path<double>(vecSize);
     std::chrono::time_point<std::chrono::system_clock> start;
     std::chrono::time_point<std::chrono::system_clock> end;
-    std::chrono::duration<double> diff;
-    for (int i = 10; i < 50001; ++i) {
-
+    std::chrono::duration<double> diff1, diff2, diff3, diff4;
+    int j = 0;
+    for (int i = 1000; i <= 100000; i+= 1000) {
         vibratoEngine.M = i;
         vadEngine.M = i;
+        for (int k=0; k<100; k++) {
+            vibratoEngine.antithetic = true;
+            vadEngine.antithetic = true;
+            start = std::chrono::system_clock::now();
+            vibratoEngine.gamma();
+            end = std::chrono::system_clock::now();
+            diff1 += (end - start);
 
-        start = std::chrono::system_clock::now();
-        vibratoEngine.gamma();
-        end = std::chrono::system_clock::now();
-        diff = end - start;
-        (*vSpeedAnti)[i - 1] = {(double) i, diff.count()};
+            start = std::chrono::system_clock::now();
+            vadEngine.gamma();
+            end = std::chrono::system_clock::now();
+            diff2 += (end - start);
 
-        start = std::chrono::system_clock::now();
-        vadEngine.gamma();
-        end = std::chrono::system_clock::now();
-        diff = end - start;
-        (*vadSpeedAnti)[i - 1] = {(double) i, diff.count()};
+            vibratoEngine.antithetic = false;
+            vadEngine.antithetic = false;
+            start = std::chrono::system_clock::now();
+            vibratoEngine.gamma();
 
-        vibratoEngine.antithetic = false;
-        vadEngine.antithetic = false;
+            end = std::chrono::system_clock::now();
+            diff3 += (end - start);
 
-        start = std::chrono::system_clock::now();
-        vibratoEngine.gamma();
-        end = std::chrono::system_clock::now();
-        diff = end - start;
-        (*vSpeed)[i - 1] = {(double) i, diff.count()};
+            start = std::chrono::system_clock::now();
+            vadEngine.gamma();
+            end = std::chrono::system_clock::now();
+            diff4 += (end - start);
 
-        start = std::chrono::system_clock::now();
-        vadEngine.gamma();
-        end = std::chrono::system_clock::now();
-        diff = end - start;
-        (*vadSpeed)[i - 1] = {(double) i, diff.count()};
+        }
+        (*vSpeedAnti)[j] = {(double) i, diff1.count()/100};
+        (*vadSpeedAnti)[j] = {(double) i, diff2.count()/100};
+        (*vSpeed)[j] = {(double) i, diff3.count()/100};
+        (*vadSpeed)[j++] = {(double) i, diff4.count()/100};
 
+        cout << "Done for i = " << i << endl;
     }
+
 
     vect2csv(destination + "speed_gamma_vad", *vadSpeed);
     vect2csv(destination + "speed_gamma_vad_anti", *vadSpeedAnti);
