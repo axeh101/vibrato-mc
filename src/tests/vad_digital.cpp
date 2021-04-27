@@ -10,19 +10,20 @@ int main() {
 
     const std::string destination = "src/python/datasets/";
 
-    double maturity = .5;
+    double maturity = 1;
+    double price = 60;
     double strike = 100;
     double rate = .05;
     double vol = .2;
     int n = 25;
-    int M = 100000;
-    int Mz = 1;
+    int M = 50000;
+    int Mz = 20;
 
     // Product definition
     DigitalOption<double> call(maturity, strike, OptionType::Call);
 
     // Black Scholes process definition
-    State<double> initialState = {0.0, 100};
+    State<double> initialState = {0.0, price};
     BlackScholesProcess<double> bs(initialState, rate, vol);
 
     // Pricing engines definition
@@ -47,7 +48,6 @@ int main() {
     auto *vibratoVolgaAnti = new Path<double>(vecSize);
 
 
-    double price = 60;
     for (int i = 0; i < vecSize; ++i) {
         bs.initialState.value = price;
 

@@ -14,8 +14,8 @@ int main() {
     double strike = 90;
     double rate = .00135;
     int n = 100;
-    int M = 1000;
-    int Mz = 2;
+    int M = 50000;
+    int Mz = 20;
     double vol = .2;
 
     // Heston params

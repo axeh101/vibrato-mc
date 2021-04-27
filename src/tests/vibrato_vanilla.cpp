@@ -9,13 +9,13 @@ int main() {
 
     const std::string destination = "src/python/datasets/";
 
-    double maturity = .5;
+    double maturity = 1;
     double strike = 100;
     double rate = .05;
     double vol = .2;
     int n = 25;
-    int M = 100000;
-    int Mz = 1;
+    int M = 50000;
+    int Mz = 20;
 
     // Product definition
     VanillaOption<double> callVanilla(maturity, strike, OptionType::Call);
