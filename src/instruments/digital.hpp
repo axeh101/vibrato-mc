@@ -10,7 +10,7 @@ class DigitalOption : public Option<T> {
 public:
     virtual~DigitalOption() = default;
 
-    DigitalOption(double maturity, T strike, const OptionType &type) :
+    DigitalOption(T& maturity, T& strike, const OptionType& type) :
             Option<T>(maturity, strike, type, "Digital Option") {};
 
     T payoff(T price) const override {

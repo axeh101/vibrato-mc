@@ -8,7 +8,7 @@ class VanillaOption : public Option<T> {
 public:
     virtual~VanillaOption() = default;
 
-    VanillaOption(double maturity, T strike, const OptionType &type) :
+    VanillaOption(T& maturity, T& strike, const OptionType& type) :
             Option<T>(maturity, strike, type, "Vanilla Option") {};
 
     T payoff(T price) const override {
