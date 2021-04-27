@@ -95,8 +95,7 @@ private:
     T ito(T value, double h) {
         T vol2 = this->vol_ * this->vol_;
         T dWt = sqrt(h) * normal();
-        T newValue = value
-                     * exp((this->rate_ - 0.5 * vol2) * h + this->vol_ * dWt);
+        T newValue = value * exp((this->rate_ - 0.5 * vol2) * h + this->vol_ * dWt);
         return newValue;
     }
 

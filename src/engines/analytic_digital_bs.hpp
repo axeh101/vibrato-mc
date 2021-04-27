@@ -76,16 +76,8 @@ public:
 
 private:
     NormalDistribution<D> normal = NormalDistribution<D>(0, 1);
-    D S;
-    D r;
-    D K;
-    D sigma;
-    double T;
-    D ract;
-    D d1;
-    D d2;
-    D nd2;
-    D pd2;
+    D S, K, r, T, sigma;
+    D ract, d1, d2, nd2, pd2;
 
     void setParams(void) {
         r = this->process_->rate();
