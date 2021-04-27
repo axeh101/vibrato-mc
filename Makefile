@@ -51,4 +51,5 @@ heston-ad:
 
 
 clean:
-	rm -rf $(BINDIR)/vibrato-*
+	rm -rf $(BINDIR)/*
+	rm -rf src/python/datasets/*
