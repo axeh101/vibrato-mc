@@ -21,7 +21,7 @@ public:
     virtual T diffusion() const = 0;
 
     virtual T eulerPriceDiff(double h, T Z) {
-        return drift() * h + diffusion() * sqrt(h) * Z;
+        return this->drift() * h + this->diffusion() * sqrt(h) * Z;
     }
 
     virtual Path<T> eulerDiscretization(int nsamples, double horizon) {
