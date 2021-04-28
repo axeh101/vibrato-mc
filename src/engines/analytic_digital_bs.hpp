@@ -50,7 +50,7 @@ public:
 
     virtual D gamma() override {
         setParams();
-        return vega() / (sigma * S * S * T);
+        return -this->option_->type() * ract * pd2 * d1  / (sigma * sigma * S * S * T);
     }
 
     virtual D theta() override {
@@ -66,12 +66,12 @@ public:
 
     virtual D vanna() override {
         setParams();
-        return ract * pd2 * (1 - d1 * d2) / (S * sigma * sigma * sqrt(T));
+        return this->option_->type() * ract * pd2 * (d1 * d2 - 1) / (S * sigma * sigma * sqrt(T));
     }
 
     virtual D volga() override {
         setParams();
-        return ract * pd2 * (d1 * d1 * d2 - d1 - d2) / (sigma * sigma);
+        return -this->option_->type() * ract * pd2 * (d1 * d1 * d2 - d1 - d2) / (sigma * sigma);
     }
 
 private:
