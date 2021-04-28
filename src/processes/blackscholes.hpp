@@ -20,11 +20,11 @@ public:
 
     virtual~BlackScholesProcess() = default;
 
-    virtual T drift() const {
+    virtual T drift() const override {
         return this->rate_ * this->priceState_.value;
     }
 
-    virtual T diffusion() const {
+    virtual T diffusion() const override {
         return vol() * this->priceState_.value;
     }
 
@@ -35,11 +35,11 @@ public:
         };
     }
 
-    virtual T vol() const {
+    virtual T vol() const override {
         return this->vol_;
     }
 
-    virtual T rate() const {
+    virtual T rate() const override {
         return this->rate_;
     }
 
@@ -63,27 +63,27 @@ public:
         return Process<T>::eulerPriceDiff(h, normal());
     }
 
-    virtual T diffDiffusionVega() const {
+    virtual T diffDiffusionVega() const override {
         return this->priceState_.value;
     }
 
-    virtual T diffDriftRho() const {
+    virtual T diffDriftRho() const override {
         return this->priceState_.value;
     }
 
-    virtual T diffDiffusionX() const {
+    virtual T diffDiffusionX() const override {
         return this->vol_;
     }
 
-    virtual T diffDriftX() const {
+    virtual T diffDriftX() const override {
         return this->rate_;
     }
 
-    virtual T diffDiffusionSigmaX() const {
+    virtual T diffDiffusionSigmaX() const override {
         return 1;
     }
 
-    virtual std::ostream &describe(std::ostream &o) const {
+    virtual std::ostream &describe(std::ostream &o) const override {
         return Process<T>::describe(o) << "Rate: " << this->rate_ << std::endl
                                        << "Volatility: " << this->vol_ << std::endl;
     }

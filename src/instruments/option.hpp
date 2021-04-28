@@ -14,7 +14,7 @@ class Option {
 public:
     virtual~Option() = default;
 
-    Option(T& maturity, T& strike, const OptionType& type, std::string name)
+    Option(T &maturity, T &strike, const OptionType &type, std::string name)
             : maturity_(maturity), strike_(strike), type_(type), name_(name) {}
 
     virtual T payoff(T price) const = 0;
@@ -25,8 +25,11 @@ public:
     virtual dual payoff(dual price) const = 0;
 
     T maturity() const { return maturity_; };
+
     T strike() const { return strike_; };
+
     std::string name() const { return name_; };
+
     const OptionType &type() const { return type_; }
 
     friend std::ostream &operator<<(std::ostream &o, const Option<T> &opt) {

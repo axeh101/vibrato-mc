@@ -6,5 +6,6 @@
 #include "rho.hpp"
 #include "vega.hpp"
 #include "theta.hpp"
+#include "volga.hpp"
 
 #endif

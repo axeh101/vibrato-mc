@@ -20,7 +20,7 @@ public:
     double h;
     bool antithetic = true;
 
-    Vibrato(Option<D> *option, BlackScholesProcess<D> *process, int n, int M, int Mz) :
+    Vibrato(Option<D> *option, Process<D> *process, int n, int M, int Mz) :
             PricingEngine<D>(option, process), n(n), M(M), Mz(Mz) {
         T = option->maturity();
         h = T / n;
@@ -31,7 +31,6 @@ public:
     virtual D premium() override {
         D r = this->process_->rate();
         D total = 0.;
-
 
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
@@ -172,7 +171,7 @@ public:
         return exp(-this->process_->rate() * T) * total / M;
     }
 
-    virtual D volga() override {
+    virtual D volga_bis()  {
         D total = 0.;
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
@@ -191,6 +190,30 @@ public:
         }
         return exp(-this->process_->rate() * T) * total / M;
     }
+
+    virtual D volga() override{
+        D total = 0.;
+        for (int i = 0; i < M; ++i) {
+            this->process_->resetState();
+            vegaTangentProcess.resetState();
+            for (int i = 0; i < n - 1; ++i) {
+                D Z = normal();
+                volgaTangentProcess.movePriceEuler(h, Z);
+                vegaTangentProcess.movePriceEuler(h, Z);
+                this->process_->movePriceEuler(h, Z);
+            }
+            total += _secondOrderVibrato(this->vegaTangentProcess.mun(h),
+                                         this->vegaTangentProcess.sigman(h),
+                                         this->vegaTangentProcess.dmun(h),
+                                         this->vegaTangentProcess.dsigman(h),
+                                         this->vegaTangentProcess.dmun(h),
+                                         this->vegaTangentProcess.dsigman(h),
+                                         this->volgaTangentProcess.dmun(h),
+                                         this->volgaTangentProcess.dsigman(h));
+        }
+        return exp(-this->process_->rate() * T) * total / M;
+    }
+
 private:
     DeltaTangent<D> deltaTangentProcess = DeltaTangent<D>({this->process_->initialState.time, 1}, this->process_);
     VegaTangent<D> vegaTangentProcess = VegaTangent<D>({this->process_->initialState.time, 0}, this->process_);
@@ -198,6 +221,7 @@ private:
     ThetaTangent<D> thetaTangentProcess = ThetaTangent<D>({this->process_->initialState.time, 0}, this->process_);
     VannaTangent<D> vannaTangentProcess = VannaTangent<D>({this->process_->initialState.time, 0},
                                                           &deltaTangentProcess, &vegaTangentProcess);
+    VolgaTangent<D> volgaTangentProcess = VolgaTangent<D>({this->process_->initialState.time, 0}, &vegaTangentProcess);
 
     NormalDistribution<D> normal = NormalDistribution<D>(0, 1);
     D T;

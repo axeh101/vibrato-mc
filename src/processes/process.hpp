@@ -115,9 +115,14 @@ public:
     virtual T diffDiffusionX2() const { return 0; }
 
     /**
-     * computes d²sigma(theta, Xkn)/dxdsigma
+     * computes d²sigma(theta, Xkn)/dx dsigma
      */
     virtual T diffDiffusionSigmaX() const { return 0; }
+
+    /**
+   * computes d²sigma(theta, Xkn)/dsigma dsigma
+   */
+    virtual T diffDiffusionSigma2() const { return 0; }
 
 protected:
     T rate_;
@@ -162,9 +167,6 @@ public:
     virtual D rate() const override {
         return this->parent_->rate();
     }
-
-    virtual Process<D> *parent() { return this->parent_; }
-
 
 };
 

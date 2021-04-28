@@ -1,9 +1,9 @@
 #ifndef VIBRATO_MC_HELPER_H
 #define VIBRATO_MC_HELPER_H
+
 #include "../all.hpp"
 
 using namespace std;
-
 
 
 class Helper {
