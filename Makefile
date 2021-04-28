@@ -52,4 +52,4 @@ heston-ad:
 
 clean:
 	rm -rf $(BINDIR)/*
-	rm -rf src/python/datasets/*
+	rm -rf src/python/datasets/*.csv
