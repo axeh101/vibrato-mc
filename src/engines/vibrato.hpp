@@ -105,7 +105,7 @@ public:
                                         this->rhoTangentProcess.sigman(h),
                                         this->rhoTangentProcess.dsigman(h));
         }
-        return exp(-this->process_->rate() * T) * total / M;
+        return exp(-this->process_->rate() * T) * total / M - T * premium();
     }
 
     virtual D theta() override {
@@ -123,7 +123,7 @@ public:
                                         this->thetaTangentProcess.sigman(h),
                                         this->thetaTangentProcess.dsigman(h));
         }
-        return exp(-this->process_->rate() * T) * total / M;
+        return exp(-this->process_->rate() * T) * (total / M - this->process_->rate() * premium());
     }
 
     virtual D gamma() override {
@@ -150,28 +150,47 @@ public:
         D total = 0.;
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
-            deltaTangentProcess.resetState();
             vegaTangentProcess.resetState();
+            deltaTangentProcess.resetState();
             vannaTangentProcess.resetState();
             for (int i = 0; i < n - 1; ++i) {
                 D Z = normal();
                 vannaTangentProcess.movePriceEuler(h, Z);
-                vegaTangentProcess.movePriceEuler(h, Z);
                 deltaTangentProcess.movePriceEuler(h, Z);
+                vegaTangentProcess.movePriceEuler(h, Z);
                 this->process_->movePriceEuler(h, Z);
             }
-            total += _secondOrderVibrato(this->deltaTangentProcess.mun(h),
-                                         this->deltaTangentProcess.sigman(h),
+            total += _secondOrderVibrato(this->vegaTangentProcess.mun(h),
+                                         this->vegaTangentProcess.sigman(h),
+                                         this->vegaTangentProcess.dmun(h),
+                                         this->vegaTangentProcess.dsigman(h),
                                          this->deltaTangentProcess.dmun(h),
                                          this->deltaTangentProcess.dsigman(h),
-                                         this->vegaTangentProcess.mun(h),
-                                         this->vegaTangentProcess.sigman(h),
-                                         this->vannaTangentProcess.mun(h),
-                                         this->vannaTangentProcess.sigman(h));
+                                         this->vannaTangentProcess.dmun(h),
+                                         this->vannaTangentProcess.dsigman(h));
         }
         return exp(-this->process_->rate() * T) * total / M;
     }
 
+    virtual D volga() override {
+        D total = 0.;
+        for (int i = 0; i < M; ++i) {
+            this->process_->resetState();
+            vegaTangentProcess.resetState();
+            for (int i = 0; i < n - 1; ++i) {
+                D Z = normal();
+                vegaTangentProcess.movePriceEuler(h, Z);
+                this->process_->movePriceEuler(h, Z);
+            }
+            total += _secondOrderVibrato(this->vegaTangentProcess.mun(h),
+                                         this->vegaTangentProcess.sigman(h),
+                                         this->vegaTangentProcess.dmun(h),
+                                         this->vegaTangentProcess.dsigman(h),
+                                         this->vegaTangentProcess.dmun(h),
+                                         this->vegaTangentProcess.dsigman(h));
+        }
+        return exp(-this->process_->rate() * T) * total / M;
+    }
 private:
     DeltaTangent<D> deltaTangentProcess = DeltaTangent<D>({this->process_->initialState.time, 1}, this->process_);
     VegaTangent<D> vegaTangentProcess = VegaTangent<D>({this->process_->initialState.time, 0}, this->process_);
@@ -181,7 +200,7 @@ private:
                                                           &deltaTangentProcess, &vegaTangentProcess);
 
     NormalDistribution<D> normal = NormalDistribution<D>(0, 1);
-    double T;
+    D T;
 
 
     D _firstOrderVibrato(D mun, D dmun, D sigman, D dsigman) {
@@ -237,11 +256,11 @@ private:
                 payoffPlus = this->option_->payoff(mun + sigman * Z);
                 payoffMinus = this->option_->payoff(mun - sigman * Z);
                 payoffMu = this->option_->payoff(mun);
+                espMu2 += Z * (payoffPlus - payoffMinus) / (2 * sigman);
                 espMuMu += (Z2 - 1) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman * sigman);
                 espSigmaSigma += (Z4 - 5 * Z2 + 2) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman * sigman);
-                espMuSigma += Z * (Z2 - 3) * (payoffPlus - payoffMinus) / (sigman * sigman);
-                espMu2 += Z * (payoffPlus - payoffMinus) / (2 * sigman);
                 espSigma2 += (Z2 - 1) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman);
+                espMuSigma += Z * (Z2 - 3) * (payoffPlus - payoffMinus) / (sigman * sigman);
             }
         } else {
             D payoff;
