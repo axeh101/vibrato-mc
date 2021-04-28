@@ -11,6 +11,7 @@ int main() {
 
     double maturity = 1;
     double strike = 100;
+    double price = 50;
     double rate = .05;
     double vol = .2;
     int n = 25;
@@ -21,7 +22,7 @@ int main() {
     VanillaOption<double> call(maturity, strike, OptionType::Call);
 
     // Black Scholes process definition
-    State<double> initialState = {0.0, 80};
+    State<double> initialState = {0.0, price};
     BlackScholesProcess<double> bs(initialState, rate, vol);
 
     // Pricing engines definition
@@ -39,10 +40,10 @@ int main() {
     std::chrono::time_point<std::chrono::system_clock> end;
     std::chrono::duration<double> diff1, diff2, diff3, diff4;
     int j = 0;
-    for (int i = 1000; i <= 100000; i+= 1000) {
+    for (int i = 1000; i <= 100000; i += 1000) {
         vibratoEngine.M = i;
         vadEngine.M = i;
-        for (int k=0; k<100; k++) {
+        for (int k = 0; k < 100; k++) {
             vibratoEngine.antithetic = true;
             vadEngine.antithetic = true;
             start = std::chrono::system_clock::now();
@@ -69,10 +70,10 @@ int main() {
             diff4 += (end - start);
 
         }
-        (*vSpeedAnti)[j] = {(double) i, diff1.count()/100};
-        (*vadSpeedAnti)[j] = {(double) i, diff2.count()/100};
-        (*vSpeed)[j] = {(double) i, diff3.count()/100};
-        (*vadSpeed)[j++] = {(double) i, diff4.count()/100};
+        (*vSpeedAnti)[j] = {(double) i, diff1.count() / 100};
+        (*vadSpeedAnti)[j] = {(double) i, diff2.count() / 100};
+        (*vSpeed)[j] = {(double) i, diff3.count() / 100};
+        (*vadSpeed)[j++] = {(double) i, diff4.count() / 100};
 
         cout << "Done for i = " << i << endl;
     }
