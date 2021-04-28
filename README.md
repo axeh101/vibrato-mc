@@ -30,13 +30,13 @@ Pour la différentiation automatique, on utilise la librairie `autodiff`. Ci-des
 2. Installation de la librairie:
    Cela requière des droits administrateurs. Il est aussi possible d'installer la librarie localement, il suffit de
    remplacer dans les commandes ci-dessous `cmake ..` par `cmake .. -DCMAKE_INSTALL_PREFIX=directory`, où _"directory"_
-   correspond a un endroit de votre choix par exemple `cmake .. -DCMAKE_INSTALL_PREFIX=~/.local` et sans le `sudo` 
+   correspond a un endroit de votre choix par exemple `cmake .. -                                                                                                                                                                                                                                                     l` et sans le `sudo` 
    à la dernière commande.
 
 ```bash
 cd autodiff
 mkdir .build && cd .build
-cmake ..
+cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local
 sudo cmake --build . --target install
 ```
 
