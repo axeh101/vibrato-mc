@@ -30,13 +30,14 @@ Pour la différentiation automatique, on utilise la librairie `autodiff`. Ci-des
 2. Installation de la librairie:
    Cela requière des droits administrateurs. Il est aussi possible d'installer la librarie localement, il suffit de
    remplacer dans les commandes ci-dessous `cmake ..` par `cmake .. -DCMAKE_INSTALL_PREFIX=directory`, où _"directory"_
-   correspond a un endroit de votre choix par exemple `cmake .. -DCMAKE_INSTALL_PREFIX=~/.local`
+   correspond a un endroit de votre choix par exemple `cmake .. -DCMAKE_INSTALL_PREFIX=~/.local` et sans le `sudo` 
+   à la dernière commande.
 
 ```bash
 cd autodiff
 mkdir .build && cd .build
 cmake ..
-cmake --build . --target install
+sudo cmake --build . --target install
 ```
 
 La librairie requière aussi la librairie `eigne3`. Pour l'installer il suffit:
