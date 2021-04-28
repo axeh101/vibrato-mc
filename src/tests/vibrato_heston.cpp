@@ -14,8 +14,8 @@ int main() {
     double rate = .05;
     double vol = .32;
     int n = 100;
-    int M = 5000;
-    int Mz = 100;
+    int M = 10000;
+    int Mz = 20;
 
 
     // Heston params
@@ -23,7 +23,7 @@ int main() {
     double correlation = .5;
     double kappa = 2.931465; // mean reversion
     double eta = 0.101; // long run mean
-    double volvol = 0.01;
+    double volvol = 0.05;
 
     // Product definition
     VanillaOption<double> o(maturity, strike, OptionType::Call);
@@ -61,40 +61,40 @@ int main() {
                           "_analytic_h_volga");
 
     // Vibrato
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.premium(); }, price, vecSize, step,
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.premium(); }, price, vecSize, step,
                           "_vibrato_heston_premium");
 
     ve.antithetic = false;
     // First order greeks
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.delta(); }, price, vecSize, step,
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.delta(); }, price, vecSize, step,
                           "_vibrato_heston_delta");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.vega(); }, price, vecSize, step,
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.vega(); }, price, vecSize, step,
                           "_vibrato_heston_vega");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.rho(); }, price, vecSize, step,
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.rho(); }, price, vecSize, step,
                           "_vibrato_heston_rho");
     // Second order greeks
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.gamma(); }, price, vecSize, step,
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.gamma(); }, price, vecSize, step,
                           "_vibrato_heston_gamma");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.vanna(); }, price, vecSize, step,
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.vanna(); }, price, vecSize, step,
                           "_vibrato_heston_vanna");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.volga(); }, price, vecSize, step,
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.volga(); }, price, vecSize, step,
                           "_vibrato_heston_volga");
 
     // Antithetic outputs
     ve.antithetic = true;
     // First order greeks
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.delta(); }, price, vecSize, step,
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.delta(); }, price, vecSize, step,
                           "_vibrato_heston_delta_anti");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.vega(); }, price, vecSize, step,
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.vega(); }, price, vecSize, step,
                           "_vibrato_heston_vega_anti");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.rho(); }, price, vecSize, step,
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.rho(); }, price, vecSize, step,
                           "_vibrato_heston_rho_anti");
     // Second order greeks
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.gamma(); }, price, vecSize, step,
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.gamma(); }, price, vecSize, step,
                           "_vibrato_heston_gamma_anti");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.vanna(); }, price, vecSize, step,
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.vanna(); }, price, vecSize, step,
                           "_vibrato_heston_vanna_anti");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.volga(); }, price, vecSize, step,
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.volga(); }, price, vecSize, step,
                           "_vibrato_heston_volga_anti");
 
     std::cout << "***** Vibrato for vanilla (Heston) terminated!" << std::endl;
