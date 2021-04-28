@@ -18,8 +18,7 @@ public:
     }
 
     dual payoff(dual price) const override {
-        dual result = (double) OptionType::Call * (price - this->strike_) > 0;
-        return result;
+        return (dual) OptionType::Call * (price - this->strike_) > (dual) 0.;
     }
 
 };

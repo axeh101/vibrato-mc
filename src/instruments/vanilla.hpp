@@ -17,9 +17,7 @@ public:
     };
 
     dual payoff(dual price) const override {
-        dual zero = 0.0;
-        dual value = (double) OptionType::Call * (price - this->strike_);
-        return std::max(value, zero);
+        return ((price - this->strike_) > (dual)0.) ? (price - this->strike_) : (dual) 0.;
     }
 };
 

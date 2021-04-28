@@ -2,8 +2,8 @@
 #define VIBRATOAD_VANILLA_HPP
 
 #include <autodiff/forward.hpp>
-
 using namespace autodiff;
+
 
 template<typename D>
 class VibratoAD : PricingEngine<D> {
@@ -33,9 +33,8 @@ public:
             }
             dual X = this->process_->priceState().value;
             total += derivative([&](auto x) { return this->_f_delta_wrt_price(x); }, wrt(X), at(X));
-
         }
-        return exp(-this->process_->rate() * T) * total / M;
+        return exp(-this->process_->rate() * 2 * T) * total / M;
     }
 
     D vanna() override {
@@ -67,6 +66,7 @@ public:
             dual X = this->process_->vol();
             total += derivative([&](auto x) { return this->_f_vega_wrt_sigma(x); }, wrt(X), at(X));
         }
+
         return exp(-this->process_->rate() * T) * total / M;
     }
 
@@ -74,12 +74,10 @@ public:
 
 
 private:
-    Option<D> *option_;
-    Process<D> *process_;
     DeltaTangent<D> deltaTangentProcess = DeltaTangent<D>({this->process_->initialState.time, 1}, this->process_);
     VegaTangent<D> vegaTangentProcess = VegaTangent<D>({this->process_->initialState.time, 0}, this->process_);
     NormalDistribution<D> normal = NormalDistribution<D>(0, 1);
-    double T;
+    D T;
 
     dual _f_delta_wrt_price(dual X) {
         D Z;
@@ -139,7 +137,7 @@ private:
                 Z = normal();
                 p = this->option_->payoff(mun + sigman * Z);
                 espmu += Z * p / (sigman);
-                espsigma += 0.5 * (Z * Z - 1) * p / (sigman * sigman);
+                espsigma += (Z * Z - 1) * p / (2 * sigman * sigman);
             }
         }
         return (dmun * espmu + dsigman * espsigma) / Mz;

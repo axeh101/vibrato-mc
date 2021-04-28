@@ -31,23 +31,23 @@ public:
     }
 
 
-    virtual T drift() const {
+    virtual T drift() const override {
         return this->rate_ * this->priceState_.value;
     }
 
-    virtual T diffusion() const {
+    virtual T diffusion() const override {
         return vol() * this->priceState_.value;
     }
 
-    virtual T vol() const {
+    virtual T vol() const override {
         return sqrt(volProcess_->priceState().value);
     }
 
-    virtual T rate() const {
+    virtual T rate() const override {
         return this->rate_;
     }
 
-    virtual State<T> movePriceEuler(double h, T Z) {
+    virtual State<T> movePriceEuler(double h, T Z) override {
         T ZS = Z * correlation_ + sqrt(1 - correlation_ * correlation_) * normal();
         this->priceState_ = this->nextPriceEuler(h, ZS);
         this->volProcess_->movePriceEuler(h, Z);
@@ -58,20 +58,29 @@ public:
         return Process<T>::eulerPriceDiff(h, normal());
     }
 
-    virtual T diffDiffusionVega() const {
+    virtual T diffDiffusionVega() const override {
         return this->priceState_.value / (2 * vol());
     }
 
-    virtual T diffDriftRho() const {
+    virtual T diffDriftRho() const override {
         return this->priceState_.value;
     }
 
-    virtual T diffDiffusionX() const {
+    virtual T diffDiffusionX() const override {
         return vol();
     }
 
-    virtual T diffDriftX() const {
+    virtual T diffDriftX() const override {
         return this->rate_;
+    }
+
+    virtual T diffDiffusionSigmaX() const override {
+        return 1 / (2 * this->vol());
+    }
+
+    virtual T diffDiffusionSigma2() const override {
+        T v = this->vol();
+        return -this->priceState_.value / (4 * v * v * v);
     }
 
     virtual std::ostream &describe(std::ostream &o) const {

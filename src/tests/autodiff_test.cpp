@@ -8,22 +8,17 @@ using namespace std;
 using namespace autodiff;
 using namespace std;
 
-dual f(dual x, dual y, dual z) {
-    double k = 0;
-    return k * exp(-x * x) + max(x, y) + z;
+dual f(dual x, dual y) {
+    return ((x-y) >= (dual)0)?(x-y):(dual)0  ;
 }
 
-dual g(dual x, dual y, dual z) {
-    return x * f(x, y, z);
-}
 
 int main() {
-    dual x = 2.0;
-    dual y = 5;
-    dual z = 1.;
-    dual u = g(x, y, z);
+    dual x = 6;
+    dual y = 6;
+    dual u = f(x, y);
 
-    double dudx = derivative(g, wrt(y), at(x, y, z));
+    double dudx = derivative(f, wrt(y), at(x, y));
     cout << "u = " << u << endl;
     cout << "du/dx = " << dudx << endl;
 
