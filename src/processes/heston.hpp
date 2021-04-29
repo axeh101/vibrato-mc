@@ -47,14 +47,14 @@ public:
         return this->rate_;
     }
 
-    virtual State<T> movePriceEuler(double h, T Z) override {
+    virtual State<T> movePriceEuler(T h, T Z) override {
         T ZS = Z * correlation_ + sqrt(1 - correlation_ * correlation_) * normal();
         this->priceState_ = this->nextPriceEuler(h, ZS);
         this->volProcess_->movePriceEuler(h, Z);
         return this->priceState_;
     }
 
-    virtual T eulerPriceDiff(double h) {
+    virtual T eulerPriceDiff(T h) {
         return Process<T>::eulerPriceDiff(h, normal());
     }
 

@@ -6,17 +6,17 @@
 
 using namespace std;
 
-
+template<typename T>
 class Helper {
 public:
-    static void generateGreek(Option<double> *o,
-                              Process<double> *p,
-                              std::function<double()> greek,
-                              double price,
+    static void generateGreek(Option<T> *o,
+                              Process<T> *p,
+                              std::function<T()> greek,
+                              T price,
                               size_t size,
                               int step,
                               std::string filename) {
-        auto *vec = new Path<double>(size);
+        auto *vec = new Path<T>(size);
         p->resetState();
         for (size_t i = 0; i < size; ++i) {
             p->initialState.value = price;

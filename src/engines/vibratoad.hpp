@@ -2,7 +2,6 @@
 #define VIBRATOAD_VANILLA_HPP
 
 #include <autodiff/forward.hpp>
-
 using namespace autodiff;
 
 
@@ -13,10 +12,10 @@ public:
     int n;
     int M;
     int Mz;
-    double h;
+    D h;
     bool antithetic = true;
 
-    VibratoAD(Option<D> *option, BlackScholesProcess<D> *process, int n, int M, int Mz) :
+    VibratoAD(Option<D> *option, Process<D> *process, int n, int M, int Mz) :
             PricingEngine<D>(option, process), n(n), M(M), Mz(Mz) {
         T = option->maturity();
         h = T / n;
@@ -37,7 +36,7 @@ public:
                 deltaTangentProcess.movePriceEuler(h, Z);
                 this->process_->movePriceEuler(h, Z);
             }
-            dual X = this->process_->priceState().value;
+            D X = this->process_->priceState().value;
             total += derivative(f, wrt(X), at(X));
         }
         return exp(-this->process_->rate() * T) * total / (M * Mz);
@@ -55,8 +54,8 @@ public:
                 vegaTangentProcess.movePriceEuler(h, Z);
                 this->process_->movePriceEuler(h, Z);
             }
-            dual sigma = this->process_->vol();
-            dual X = this->process_->priceState().value;
+            D sigma = this->process_->vol();
+            D X = this->process_->priceState().value;
             total += derivative(f, wrt(X), at(X, sigma));
         }
         return exp(-this->process_->rate() * T) * total / (M * Mz);
@@ -74,8 +73,8 @@ public:
                 vegaTangentProcess.movePriceEuler(h, Z);
                 this->process_->movePriceEuler(h, Z);
             }
-            dual sigma = this->process_->vol();
-            dual X = this->process_->priceState().value;
+            D sigma = this->process_->vol();
+            D X = this->process_->priceState().value;
             total += derivative(f, wrt(sigma), at(X, sigma));
         }
 
@@ -91,18 +90,18 @@ private:
     NormalDistribution<D> normal = NormalDistribution<D>(0, 1);
     D T;
 
-    dual _f_delta(dual X) {
+    D _f_delta(D X) {
         D Z;
-        dual espmu = 0;
-        dual espsigma = 0;
-        dual mun = X * (1 + this->process_->rate() * h);
-        dual sigman = X * this->process_->vol() * sqrt(h);
-        dual dmun = deltaTangentProcess.dmun(h);
-        dual dsigman = deltaTangentProcess.dsigman(h);
+        D espmu = 0;
+        D espsigma = 0;
+        D mun = X * (1 + this->process_->rate() * h);
+        D sigman = X * this->process_->vol() * sqrt(h);
+        D dmun = deltaTangentProcess.dmun(h);
+        D dsigman = deltaTangentProcess.dsigman(h);
         if (antithetic) {
-            dual payoffPlus;
-            dual payoffMinus;
-            dual payoffMu;
+            D payoffPlus;
+            D payoffMinus;
+            D payoffMu;
             for (int j = 0; j < Mz; j++) {
                 Z = normal();
                 payoffPlus = this->option_->payoff(mun + sigman * Z);
@@ -112,7 +111,7 @@ private:
                 espsigma += (Z * Z - 1) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman);
             }
         } else {
-            dual p;
+            D p;
             for (int j = 0; j < Mz; j++) {
                 Z = normal();
                 p = this->option_->payoff(mun + sigman * Z);
@@ -123,18 +122,18 @@ private:
         return (dmun * espmu + dsigman * espsigma);
     }
 
-    dual _f_vega(dual X, dual sigma) {
-        dual Z;
-        dual espmu = 0;
-        dual espsigma = 0;
-        dual sigman = X * sigma * sqrt(h);
-        dual dmun = vegaTangentProcess.dmun(h);
-        dual mun = X * (1 + this->process_->rate() * h);
-        dual dsigman = X + sigma * vegaTangentProcess.priceState().value * sqrt(h);
+    D _f_vega(D X, D sigma) {
+        D Z;
+        D espmu = 0;
+        D espsigma = 0;
+        D sigman = X * sigma * sqrt(h);
+        D dmun = vegaTangentProcess.dmun(h);
+        D mun = X * (1 + this->process_->rate() * h);
+        D dsigman = X + sigma * vegaTangentProcess.priceState().value * sqrt(h);
         if (antithetic) {
-            dual payoffPlus;
-            dual payoffMinus;
-            dual payoffMu;
+            D payoffPlus;
+            D payoffMinus;
+            D payoffMu;
             for (int j = 0; j < Mz; j++) {
                 Z = normal();
                 payoffPlus = this->option_->payoff(mun + sigman * Z);
@@ -144,7 +143,7 @@ private:
                 espsigma += (Z * Z - 1) * (payoffPlus - 2 * payoffMu + payoffMinus) / (2 * sigman);
             }
         } else {
-            dual p;
+            D p;
             for (int j = 0; j < Mz; j++) {
                 Z = normal();
                 p = this->option_->payoff(mun + sigman * Z);

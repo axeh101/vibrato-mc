@@ -28,7 +28,7 @@ public:
         return vol() * this->priceState_.value;
     }
 
-    virtual State<T> nextIto(double h) {
+    virtual State<T> nextIto(T h) {
         return {
                 this->priceState_.time + h,
                 ito(this->priceState_.value, h)
@@ -43,23 +43,23 @@ public:
         return this->rate_;
     }
 
-    virtual State<T> moveIto(double t) {
+    virtual State<T> moveIto(T t) {
         this->priceState_ = nextIto(t);
         return this->priceState_;
     }
 
-    virtual Path<T> generatePath(int nsamples, double horizon) {
+    virtual Path<T> generatePath(int nsamples, T horizon) {
         this->resetState();
         Path<T> path = Path<T>(nsamples + 1);
         path[0] = this->initialState;
-        double h = horizon / nsamples;
+        T h = horizon / nsamples;
         for (int i = 1; i <= nsamples; i++) {
             path[i] = this->moveIto(h);
         }
         return path;
     }
 
-    virtual T eulerPriceDiff(double h) {
+    virtual T eulerPriceDiff(T h) {
         return Process<T>::eulerPriceDiff(h, normal());
     }
 
@@ -92,7 +92,7 @@ private:
 
     NormalDistribution<T> normal = NormalDistribution<T>(0, 1);
 
-    T ito(T value, double h) {
+    T ito(T value, T h) {
         T vol2 = this->vol_ * this->vol_;
         T dWt = sqrt(h) * normal();
         T newValue = value * exp((this->rate_ - 0.5 * vol2) * h + this->vol_ * dWt);

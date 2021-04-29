@@ -28,7 +28,10 @@ public:
     virtual~NormalDistribution() {};
 
     T cdf(T x) const override {
-        return erfc(-(x - m_) / (sigma_ * sqrt(2))) / 2;
+        T numer = -(x - m_);
+        T denom = sigma_ * sqrt(2);
+        T ratio = numer / denom;
+        return erfc((double) ratio) / 2;
     }
 
     T pdf(T x) const override {

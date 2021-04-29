@@ -20,11 +20,6 @@ public:
 
     virtual T payoff(T price) const = 0;
 
-    // Specific payoff for automatic differentiation using autodiff
-    // using dual in as a template parameter generates a lot of errors
-    // this is a hacky way to get the job done without much trouble.
-    virtual dual payoff(dual price) const = 0;
-
     T maturity() const { return maturity_; };
 
     T strike() const { return strike_; };
@@ -32,6 +27,8 @@ public:
     std::string name() const { return name_; };
 
     const OptionType &type() const { return type_; }
+
+    const double dtype() const { return (double) type_; }
 
     friend std::ostream &operator<<(std::ostream &o, const Option<T> &opt) {
         return opt.describe(o);

@@ -20,12 +20,12 @@ public:
 
     virtual T diffusion() const = 0;
 
-    virtual Path<T> eulerDiscretization(int nsamples, double horizon) {
+    virtual Path<T> eulerDiscretization(int nsamples, T horizon) {
         NormalDistribution<T> N = NormalDistribution<T>(0, 1);
         resetState();
         Path<T> path = Path<T>(nsamples + 1);
         path[0] = initialState;
-        double h = horizon / nsamples;
+        T h = horizon / nsamples;
         for (int i = 1; i <= nsamples; ++i) {
             path[i] = movePriceEuler(h, N());
         }
@@ -34,19 +34,19 @@ public:
     }
 
 
-    virtual State<T> movePriceEuler(double h, T Z) {
+    virtual State<T> movePriceEuler(T h, T Z) {
         this->priceState_ = this->nextPriceEuler(h, Z);
         return this->priceState_;
     }
 
-    virtual State<T> nextPriceEuler(double h, T Z) {
+    virtual State<T> nextPriceEuler(T h, T Z) {
         return {
                 priceState_.time + h,
                 priceState_.value + eulerPriceDiff(h, Z),
         };
     }
 
-    virtual T eulerPriceDiff(double h, T Z) {
+    virtual T eulerPriceDiff(T h, T Z) {
         return this->drift() * h + this->diffusion() * sqrt(h) * Z;
     }
 
@@ -145,19 +145,19 @@ public:
     TangentProcess(State<D> initialState, std::string name, Process<D> *parent) :
             Process<D>(initialState, name), parent_(parent) {}
 
-    virtual D mun(double h) {
+    virtual D mun(D h) {
         return this->parent_->priceState().value + this->parent_->drift() * h;
     }
 
-    virtual D dmun(double h) {
+    virtual D dmun(D h) {
         return this->priceState_.value + this->drift() * h;
     }
 
-    virtual D sigman(double h) {
+    virtual D sigman(D h) {
         return this->parent_->diffusion() * sqrt(h);
     }
 
-    virtual D dsigman(double h) {
+    virtual D dsigman(D h) {
         return this->diffusion() * sqrt(h);
     }
 

@@ -13,13 +13,10 @@ public:
             Option<T>(maturity, strike, type, "Vanilla Option") {};
 
     T payoff(T price) const override {
-        return max(this->type_ * (price - this->strike_), 0.);
+        T value = this->dtype() * (price - this->strike_);
+        return value > 0 ? value : 0;
     };
 
-    dual payoff(dual price) const override {
-        dual value = (dual) this->type_ * (price - this->strike_);
-        return (value > (dual) 0.) ? value : (dual) 0.;
-    }
 };
 
 #endif  // VANILLAOPTION_HPP
