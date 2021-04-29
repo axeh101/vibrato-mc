@@ -40,7 +40,7 @@ int main() {
     std::chrono::time_point<std::chrono::system_clock> end;
     std::chrono::duration<double> diff1, diff2, diff3, diff4;
     int j = 0;
-    for (int i = 1000; i <= 10000; i += 1000) {
+    for (int i = 1000; i <= 100000; i += 1000) {
         vibratoEngine.M = i;
         vadEngine.M = i;
         for (int k = 0; k < 100; k++) {
