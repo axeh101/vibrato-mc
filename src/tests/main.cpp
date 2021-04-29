@@ -10,7 +10,7 @@ int main(void) {
 
     // Computation of the premium and greeks analytical BS vs vibrato BS
 
-    double maturity = 1;
+    double maturity = .5;
     double strike = 100;
     double price = 100;
     double rate = .05;
@@ -33,13 +33,13 @@ int main(void) {
     HestonProcess<double> heston(initialState, &cir, rate, correlation);
     BlackScholesProcess<double> bs(initialState, rate, vol);
 
-    VanillaOption<double> vcall(maturity, strike, OptionType::Call);
-    DigitalOption<double> dput(maturity, strike, OptionType::Put);
+    VanillaOption<double> vopt(maturity, strike, OptionType::Call);
+    DigitalOption<double> dopt(maturity, strike, OptionType::Call);
 
     // Pricing engines definition
-    auto ve = Vibrato<double>(&vcall, &heston, n, M, Mz);
-    auto be = AnalyticalVanillaBS<double>(&vcall, &bs);
-    auto de = AnalyticalDigitalBS<double>(&dput, &bs);
+    auto ve = Vibrato<double>(&vopt, &heston, n, M, Mz);
+    auto be = AnalyticalVanillaBS<double>(&vopt, &bs);
+    auto de = AnalyticalDigitalBS<double>(&dopt, &bs);
 
 
     cout << "**************** Pricing results ****************" << endl;
@@ -57,7 +57,7 @@ int main(void) {
     cout << "Pricing Digital option Analytic vs Vibrato Heston" << endl;
     cout << "*************************************************" << endl;
 
-    ve.changeOption(dput);
+    ve.changeOption(dopt);
     bs.resetState();
 
     cout << "*************** Put Black-Scholes ***************" << endl;
