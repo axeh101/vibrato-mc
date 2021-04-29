@@ -48,7 +48,6 @@ public:
 
     virtual std::ostream &describe(std::ostream &o) const {
         return Process<T>::describe(o) <<
-                                       "Rate: " << this->rate_ << std::endl <<
                                        "Kappa:" << this->rate_ << std::endl <<
                                        "Eta:" << eta_ << std::endl <<
                                        "Vol Vol:" << this->vol_ << std::endl <<
