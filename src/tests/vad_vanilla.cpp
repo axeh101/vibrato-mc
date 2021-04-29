@@ -19,12 +19,12 @@ int main() {
     dual rate = .05;
     dual vol = .2;
 
-    int n = 25;
-    int M = 50000;
+    int n = 100;
+    int M = 10000;
     int Mz = 20;
 
     // Product definition
-    VanillaOption<dual> o(maturity, strike, OptionType::Call);
+    VanillaOption<dual> o(maturity, strike, OptionType::Put);
 
     // Black Scholes process definition
     State<dual> initialState = {0.0, price};
@@ -42,8 +42,6 @@ int main() {
                                 "_analytic_ad_gamma");
     Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return be.vanna(); }, price, vecSize, step,
                                 "_analytic_ad_vanna");
-    Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return be.volga(); }, price, vecSize, step,
-                                "_analytic_ad_volga");
 
 
     ve.antithetic = false;
@@ -51,8 +49,6 @@ int main() {
                                 "_vibrato_ad_gamma");
     Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return ve.vanna(); }, price, vecSize, step,
                                 "_vibrato_ad_vanna");
-    Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return ve.volga(); }, price, vecSize, step,
-                                "_vibrato_ad_volga");
 
     // Antithetic outputs
     ve.antithetic = true;
@@ -60,8 +56,6 @@ int main() {
                                 "_vibrato_ad_gamma_anti");
     Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return ve.vanna(); }, price, vecSize, step,
                                 "_vibrato_ad_vanna_anti");
-    Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return ve.volga(); }, price, vecSize, step,
-                                "_vibrato_ad_volga_anti");
 
 
     std::cout << "***** Vibrato for vanilla options terminated!" << std::endl;

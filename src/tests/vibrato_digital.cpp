@@ -14,11 +14,11 @@ int main() {
     double rate = .05;
     double vol = .2;
     int n = 25;
-    int M = 50000;
-    int Mz = 10;
+    int M = 10000;
+    int Mz = 20;
 
     // Product definition
-    DigitalOption<double> o(maturity, strike, OptionType::Put);
+    DigitalOption<double> o(maturity, strike, OptionType::Call);
 
     // Black Scholes process definition
     State<double> initialState = {0.0, price};

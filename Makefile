@@ -14,14 +14,14 @@ all: setup
 
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-heston $(CFLAGS) $(TESTDIR)/vibrato_heston.cpp
 
-	$(CC) -o $(BINDIR)/vad-digital $(CFLAGS) $(TESTDIR)/vad_digital.cpp
 	$(CC) -o $(BINDIR)/vad-vanilla $(CFLAGS) $(TESTDIR)/vad_vanilla.cpp
 	$(CC) -o $(BINDIR)/vad-heston $(CFLAGS) $(TESTDIR)/vad_heston.cpp
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-perf $(CFLAGS) $(TESTDIR)/performance.cpp
+	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-speed $(CFLAGS) $(TESTDIR)/speed.cpp
 
 
 perf: setup
-	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-performances $(CFLAGS) $(TESTDIR)/performance.cpp
+	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-perf $(CFLAGS) $(TESTDIR)/performance.cpp
 	$(CC) -o $(BINDIR)/$(PROJECT_NAME)-speed $(CFLAGS) $(TESTDIR)/speed.cpp
 
 digital: setup
@@ -39,8 +39,6 @@ main: setup
 vanilla-ad: setup
 	$(CC) -o $(BINDIR)/vad-vanilla $(CFLAGS) $(TESTDIR)/vad_vanilla.cpp
 
-digital-ad: setup
-	$(CC) -o $(BINDIR)/vad-digital $(CFLAGS) $(TESTDIR)/vad_digital.cpp
 
 heston-ad: setup
 	$(CC) -o $(BINDIR)/vad-heston $(CFLAGS) $(TESTDIR)/vad_heston.cpp

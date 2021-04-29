@@ -17,7 +17,7 @@ public:
     int n;
     int M;
     int Mz;
-    double h;
+    D h;
     bool antithetic = true;
 
     Vibrato(Option<D> *option, Process<D> *process, int n, int M, int Mz) :

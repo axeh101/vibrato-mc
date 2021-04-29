@@ -14,11 +14,11 @@ int main() {
     double rate = .05;
     double vol = .2;
     int n = 25;
-    int M = 50000;
+    int M = 10000;
     int Mz = 20;
 
     // Product definition
-    VanillaOption<double> o(maturity, strike, OptionType::Call);
+    VanillaOption<double> o(maturity, strike, OptionType::Put);
 
     // Black Scholes process definition
     State<double> initialState = {0.0, price};
