@@ -30,7 +30,7 @@ Pour la différentiation automatique, on utilise la librairie `autodiff`. Ci-des
 2. Installation de la librairie:
    Cela requière des droits administrateurs. Il est aussi possible d'installer la librarie localement, il suffit de
    remplacer dans les commandes ci-dessous `cmake ..` par `cmake .. -DCMAKE_INSTALL_PREFIX=directory`, où _"directory"_
-   correspond a un endroit de votre choix par exemple `cmake .. -                                                                                                                                                                                                                                                     l` et sans le `sudo` 
+   correspond a un endroit de votre choix par exemple `cmake .. - l` et sans le `sudo`
    à la dernière commande.
 
 ```bash
@@ -78,5 +78,69 @@ make all
 4. pour les sorties des mesure de performances:
 
     - Executer ```make perf``` puis `bin/./vibrato-perf`
-   
 
+# Exemple de sortie du programme de calcul :
+
+                              **************** Pricing results ****************
+                              *************************************************
+                              Pricing Vanilla option Analytic vs Vibrato Heston
+                              *************************************************
+      *************** Black-Scholes **************     ************* Vibrato (Heston) ****************
+      Name: Vanilla Option                                  Name: Vanilla Option
+      Option Type: Call                                     Option Type: Call
+      Maturity: 1                                           Maturity: 1
+      Strike: 100                                           Strike: 100
+      
+      Process name: Black-Scholes                           Process name: Heston
+   
+      Rate: 0.05                                            Rate: 0.05
+      Volatility: 0.32                                      Volatility:
+                                                               Process name: Cox-Ingeresoll-Ross
+                                                               Rate: 2.93147
+                                                               Kappa:2.93147
+                                                               Eta:0.101
+                                                               Vol Vol:0.05
+                                                               Correlation:0.5
+      ************************************************************************************************
+      Premium: 14.9902                                     Premium: 15.0166
+      Delta: 0.624094                                      Delta: 0.559846
+      Gamma: 0.0118588                                     Gamma: 0.0141318
+      Vega: 37.9483                                        Vega: 30.8113
+      Vanna: 0.00444707                                    Vanna: 0.336125
+      Volga: -0.140638                                     Volga: 248.548
+      Rho: 47.4192                                         Rho: 44.8867
+      Theta: -8.44269                                      Theta: -0.717607
+
+
+
+
+                              *************************************************
+                              Pricing Digital option Analytic vs Vibrato Heston
+                              *************************************************
+
+      ************ Black-Scholes ****************     ************** Vibrato (Heston) ****************
+      Name: Digital Option                               Name: Digital Option
+      Option Type: Call                                  Option Type: Call
+      Maturity: 1                                        Maturity: 1
+      Strike: 100                                        Strike: 100
+      Price: 100                                         Price: 100
+      Rate: 0.05                                         Rate: 0.05
+      Volatility: 0.32                                   Volatility:
+                                                            Process name: Cox-Ingeresoll-Ross
+                                                            Initial vol: 0.028087
+                                                            Rate: 2.93147
+                                                            Kappa:2.93147
+                                                            Eta:0.101
+                                                            Vol Vol:0.05
+                                                            Correlation:0.5
+      ************************************************************************************************
+      Premium: 0.474192                                  Premium: 0.477912
+      Delta: 0.0118588                                   Delta: 0.0117135
+      Gamma:  0.000117199                                Gamma: 0.000114066
+      Vega: -0.375036                                    Vega: -0.241489
+      Vanna: -0.0371028                                  Vanna: -0.0433652
+      Volga: 1.15948                                     Volga: 6.33861
+      Rho: 0.711693                                      Rho: 0.737581
+      Theta: -0.0244211                                  Theta: -0.0222913
+
+                              *********************~END~***********************

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "../all.hpp"
+#include "helper.hpp"
 
 using namespace std;
 
@@ -7,26 +8,25 @@ int main() {
 
     std::cout << "***** Staring vibrato for options (Heston) !" << std::endl;
 
-    const std::string destination = "src/python/datasets/";
-
     double maturity = 1;
-    double price = 60;
-    double strike = 90;
-    double rate = .00135;
+    double strike = 100;
+    double price = 50;
+    double rate = .05;
+    double vol = .32;
     int n = 100;
-    int M = 50000;
+    int M = 10000;
     int Mz = 20;
-    double vol = .2;
+
 
     // Heston params
     double initialVol = 0.028087;
     double correlation = .5;
     double kappa = 2.931465; // mean reversion
     double eta = 0.101; // long run mean
-    double volvol = 0.01;
+    double volvol = 0.05;
 
     // Product definition
-    VanillaOption<double> call(maturity, strike, OptionType::Call);
+    VanillaOption<double> o(maturity, strike, OptionType::Call);
 
     // Heston & CIR process definition
     State<double> initialState = {0.0, price};
@@ -35,77 +35,67 @@ int main() {
     BlackScholesProcess<double> bs(initialState, rate, vol);
 
     // Pricing engines definition
-    auto vibratoEngine = Vibrato<double>(&call, &bs, n, M, Mz);
-    auto bsEngine = AnalyticalVanillaBS<double>(&call, &bs);
+    auto ve = Vibrato<double>(&o, &heston, n, M, Mz);
+    auto be = AnalyticalVanillaBS<double>(&o, &bs);
 
-    double vecSize = 200;
-    // Premium tests
-    auto *vibratoPremium = new Path<double>(vecSize);
-    auto *analyticPremium = new Path<double>(vecSize);
 
-    // delta tests
-    auto *vibratoDelta = new Path<double>(vecSize);
-    auto *analyticDelta = new Path<double>(vecSize);
-    auto *vibratoDeltaAntithetic = new Path<double>(vecSize);
+    size_t vecSize = 100;
+    int step = 1;
 
-    // vega tests
-    auto *vibratoVega = new Path<double>(vecSize);
-    auto *analyticVega = new Path<double>(vecSize);
-    auto *vibratoVegaAntithetic = new Path<double>(vecSize);
+    // Black Scholes
+    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.premium(); }, price, vecSize, step,
+                          "_analytic_h_premium");
 
-    // rho tests
-    auto *vibratoRho = new Path<double>(vecSize);
-    auto *analyticRho = new Path<double>(vecSize);
-    auto *vibratoRhoAntithetic = new Path<double>(vecSize);
+    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.delta(); }, price, vecSize, step,
+                          "_analytic_h_delta");
+    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.vega(); }, price, vecSize, step,
+                          "_analytic_h_vega");
+    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.rho(); }, price, vecSize, step,
+                          "_analytic_h_rho");
+    // Second order greeks
+    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.gamma(); }, price, vecSize, step,
+                          "_analytic_h_gamma");
+    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.vanna(); }, price, vecSize, step,
+                          "_analytic_h_vanna");
+    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.volga(); }, price, vecSize, step,
+                          "_analytic_h_volga");
 
-    for (int i = 0; i < vecSize; ++i) {
-        bs.initialState.value = price;
-        (*analyticPremium)[i] = {price, bsEngine.premium()};
-        (*analyticDelta)[i] = {price, bsEngine.delta()};
-        (*analyticVega)[i] = {price, bsEngine.vega()};
-        (*analyticRho)[i] = {price, bsEngine.rho()};
+    // Vibrato
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.premium(); }, price, vecSize, step,
+                          "_vibrato_heston_premium");
 
-        vibratoEngine.antithetic = true;
-        (*vibratoPremium)[i] = {price, vibratoEngine.premium()};
-        (*vibratoVegaAntithetic)[i] = {price, vibratoEngine.vega()};
-        (*vibratoDeltaAntithetic)[i] = {price, vibratoEngine.delta()};
-        (*vibratoRhoAntithetic)[i] = {price, vibratoEngine.rho()};
+    ve.antithetic = false;
+    // First order greeks
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.delta(); }, price, vecSize, step,
+                          "_vibrato_heston_delta");
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.vega(); }, price, vecSize, step,
+                          "_vibrato_heston_vega");
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.rho(); }, price, vecSize, step,
+                          "_vibrato_heston_rho");
+    // Second order greeks
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.gamma(); }, price, vecSize, step,
+                          "_vibrato_heston_gamma");
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.vanna(); }, price, vecSize, step,
+                          "_vibrato_heston_vanna");
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.volga(); }, price, vecSize, step,
+                          "_vibrato_heston_volga");
 
-        vibratoEngine.antithetic = false;
-        (*vibratoDelta)[i] = {price, vibratoEngine.delta()};
-        (*vibratoVega)[i] = {price, vibratoEngine.vega()};
-        (*vibratoRho)[i] = {price, vibratoEngine.rho()};
-
-        price += 0.5;
-    }
-
-    vect2csv(destination + "call_heston_analytic_premium", *analyticPremium);
-    vect2csv(destination + "call_heston_vibrato_premium", *vibratoPremium);
-
-    vect2csv(destination + "call_heston_analytic_delta", *analyticDelta);
-    vect2csv(destination + "call_heston_vibrato_delta", *vibratoDelta);
-    vect2csv(destination + "call_heston_vibrato_delta_antithetic", *vibratoDeltaAntithetic);
-
-    vect2csv(destination + "call_heston_analytic_vega", *analyticVega);
-    vect2csv(destination + "call_heston_vibrato_vega", *vibratoVega);
-    vect2csv(destination + "call_heston_vibrato_vega_antithetic", *vibratoVegaAntithetic);
-
-    vect2csv(destination + "call_heston_analytic_rho", *analyticRho);
-    vect2csv(destination + "call_heston_vibrato_rho", *vibratoRho);
-    vect2csv(destination + "call_heston_vibrato_rho_antithetic", *vibratoRhoAntithetic);
-
-    delete vibratoPremium;
-    delete analyticPremium;
-    delete analyticDelta;
-    delete analyticRho;
-
-    delete vibratoDelta;
-    delete vibratoVega;
-    delete vibratoRho;
-
-    delete vibratoDeltaAntithetic;
-    delete vibratoVegaAntithetic;
-    delete vibratoRhoAntithetic;
+    // Antithetic outputs
+    ve.antithetic = true;
+    // First order greeks
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.delta(); }, price, vecSize, step,
+                          "_vibrato_heston_delta_anti");
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.vega(); }, price, vecSize, step,
+                          "_vibrato_heston_vega_anti");
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.rho(); }, price, vecSize, step,
+                          "_vibrato_heston_rho_anti");
+    // Second order greeks
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.gamma(); }, price, vecSize, step,
+                          "_vibrato_heston_gamma_anti");
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.vanna(); }, price, vecSize, step,
+                          "_vibrato_heston_vanna_anti");
+    Helper::generateGreek(&o, &heston, [&](void) -> double { return ve.volga(); }, price, vecSize, step,
+                          "_vibrato_heston_volga_anti");
 
     std::cout << "***** Vibrato for vanilla (Heston) terminated!" << std::endl;
 

@@ -1,6 +1,7 @@
 #ifndef VIBRATO_MC_HELPER_H
 #define VIBRATO_MC_HELPER_H
 
+#include <functional>
 #include "../all.hpp"
 
 using namespace std;
@@ -16,6 +17,7 @@ public:
                               int step,
                               std::string filename) {
         auto *vec = new Path<double>(size);
+        p->resetState();
         for (size_t i = 0; i < size; ++i) {
             p->initialState.value = price;
             (*vec)[i] = {price, greek()};

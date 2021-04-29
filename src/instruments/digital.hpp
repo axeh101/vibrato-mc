@@ -10,7 +10,7 @@ class DigitalOption : public Option<T> {
 public:
     virtual~DigitalOption() = default;
 
-    DigitalOption(T& maturity, T& strike, const OptionType& type) :
+    DigitalOption(T &maturity, T &strike, const OptionType &type) :
             Option<T>(maturity, strike, type, "Digital Option") {};
 
     T payoff(T price) const override {
@@ -18,11 +18,7 @@ public:
     }
 
     dual payoff(dual price) const override {
-        dual val = price - this->strike_;
-        if (this->type_ == OptionType::Call) {
-            return val > 0;
-        }
-        return val < 0;
+        return ((double) this->type_) * (price - this->strike_) > (dual) 0.;
     }
 
 };

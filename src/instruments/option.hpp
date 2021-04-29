@@ -5,6 +5,7 @@
 #include <autodiff/forward.hpp>
 
 using namespace autodiff;
+
 enum OptionType {
     Call = 1, Put = -1
 };

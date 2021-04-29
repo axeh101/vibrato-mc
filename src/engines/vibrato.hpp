@@ -171,7 +171,7 @@ public:
         return exp(-this->process_->rate() * T) * total / M;
     }
 
-    virtual D volga_bis()  {
+    virtual D volga() override {
         D total = 0.;
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
@@ -191,28 +191,28 @@ public:
         return exp(-this->process_->rate() * T) * total / M;
     }
 
-    virtual D volga() override{
-        D total = 0.;
-        for (int i = 0; i < M; ++i) {
-            this->process_->resetState();
-            vegaTangentProcess.resetState();
-            for (int i = 0; i < n - 1; ++i) {
-                D Z = normal();
-                volgaTangentProcess.movePriceEuler(h, Z);
-                vegaTangentProcess.movePriceEuler(h, Z);
-                this->process_->movePriceEuler(h, Z);
-            }
-            total += _secondOrderVibrato(this->vegaTangentProcess.mun(h),
-                                         this->vegaTangentProcess.sigman(h),
-                                         this->vegaTangentProcess.dmun(h),
-                                         this->vegaTangentProcess.dsigman(h),
-                                         this->vegaTangentProcess.dmun(h),
-                                         this->vegaTangentProcess.dsigman(h),
-                                         this->volgaTangentProcess.dmun(h),
-                                         this->volgaTangentProcess.dsigman(h));
-        }
-        return exp(-this->process_->rate() * T) * total / M;
-    }
+//    virtual D volga() override{
+//        D total = 0.;
+//        for (int i = 0; i < M; ++i) {
+//            this->process_->resetState();
+//            vegaTangentProcess.resetState();
+//            for (int i = 0; i < n - 1; ++i) {
+//                D Z = normal();
+//                volgaTangentProcess.movePriceEuler(h, Z);
+//                vegaTangentProcess.movePriceEuler(h, Z);
+//                this->process_->movePriceEuler(h, Z);
+//            }
+//            total += _secondOrderVibrato(this->vegaTangentProcess.mun(h),
+//                                         this->vegaTangentProcess.sigman(h),
+//                                         this->vegaTangentProcess.dmun(h),
+//                                         this->vegaTangentProcess.dsigman(h),
+//                                         this->vegaTangentProcess.dmun(h),
+//                                         this->vegaTangentProcess.dsigman(h),
+//                                         this->volgaTangentProcess.dmun(h),
+//                                         this->volgaTangentProcess.dsigman(h));
+//        }
+//        return exp(-this->process_->rate() * T) * total / M;
+//    }
 
 private:
     DeltaTangent<D> deltaTangentProcess = DeltaTangent<D>({this->process_->initialState.time, 1}, this->process_);
