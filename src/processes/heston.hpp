@@ -82,7 +82,10 @@ public:
         T v = this->vol();
         return -this->priceState_.value / (4 * v * v * v);
     }
-
+    virtual void resetState() {
+        volProcess_->resetState();
+        Process<T>::resetState();
+    }
     virtual std::ostream &describe(std::ostream &o) const {
         return Process<T>::describe(o) <<
                                        "Rate: " << this->rate_ << std::endl <<
