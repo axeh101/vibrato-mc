@@ -2,7 +2,6 @@
 #define VIBRATOAD_VANILLA_HPP
 
 #include <autodiff/forward.hpp>
-
 using namespace autodiff;
 
 
@@ -16,7 +15,7 @@ public:
     D h;
     bool antithetic = true;
 
-    VibratoAD(Option<D> *option, BlackScholesProcess<D> *process, int n, int M, int Mz) :
+    VibratoAD(Option<D> *option, Process<D> *process, int n, int M, int Mz) :
             PricingEngine<D>(option, process), n(n), M(M), Mz(Mz) {
         T = option->maturity();
         h = T / n;
