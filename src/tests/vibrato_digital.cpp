@@ -35,62 +35,62 @@ int main() {
 
 
     // Black Scholes
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.premium(); }, price, vecSize, step,
-                          "_analytic_digital_premium");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return be.premium(); }, price, vecSize, step,
+                                  "_analytic_digital_premium");
 
     // First Order
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.delta(); }, price, vecSize, step,
-                          "_analytic_digital_delta");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.vega(); }, price, vecSize, step,
-                          "_analytic_digital_vega");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.rho(); }, price, vecSize, step,
-                          "_analytic_digital_rho");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return be.delta(); }, price, vecSize, step,
+                                  "_analytic_digital_delta");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return be.vega(); }, price, vecSize, step,
+                                  "_analytic_digital_vega");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return be.rho(); }, price, vecSize, step,
+                                  "_analytic_digital_rho");
 
     // Second order greeks
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.gamma(); }, price, vecSize, step,
-                          "_analytic_digital_gamma");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.vanna(); }, price, vecSize, step,
-                          "_analytic_digital_vanna");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.volga(); }, price, vecSize, step,
-                          "_analytic_digital_volga");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return be.gamma(); }, price, vecSize, step,
+                                  "_analytic_digital_gamma");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return be.vanna(); }, price, vecSize, step,
+                                  "_analytic_digital_vanna");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return be.volga(); }, price, vecSize, step,
+                                  "_analytic_digital_volga");
 
     // Vibrato
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.premium(); }, price, vecSize, step,
-                          "_vibrato_digital_premium");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return ve.premium(); }, price, vecSize, step,
+                                  "_vibrato_digital_premium");
 
     ve.antithetic = false;
     // First order greeks
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.delta(); }, price, vecSize, step,
-                          "_vibrato_digital_delta");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.vega(); }, price, vecSize, step,
-                          "_vibrato_digital_vega");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.rho(); }, price, vecSize, step,
-                          "_vibrato_digital_rho");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return ve.delta(); }, price, vecSize, step,
+                                  "_vibrato_digital_delta");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return ve.vega(); }, price, vecSize, step,
+                                  "_vibrato_digital_vega");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return ve.rho(); }, price, vecSize, step,
+                                  "_vibrato_digital_rho");
     // Second order greeks
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.gamma(); }, price, vecSize, step,
-                          "_vibrato_digital_gamma");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.vanna(); }, price, vecSize, step,
-                          "_vibrato_digital_vanna");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.volga(); }, price, vecSize, step,
-                          "_vibrato_digital_volga");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return ve.gamma(); }, price, vecSize, step,
+                                  "_vibrato_digital_gamma");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return ve.vanna(); }, price, vecSize, step,
+                                  "_vibrato_digital_vanna");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return ve.volga(); }, price, vecSize, step,
+                                  "_vibrato_digital_volga");
 
 
     // Antithetic outos
     ve.antithetic = true;
     // First order greeks
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.delta(); }, price, vecSize, step,
-                          "_vibrato_digital_delta_anti");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.vega(); }, price, vecSize, step,
-                          "_vibrato_digital_vega_anti");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.rho(); }, price, vecSize, step,
-                          "_vibrato_digital_rho_anti");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return ve.delta(); }, price, vecSize, step,
+                                  "_vibrato_digital_delta_anti");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return ve.vega(); }, price, vecSize, step,
+                                  "_vibrato_digital_vega_anti");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return ve.rho(); }, price, vecSize, step,
+                                  "_vibrato_digital_rho_anti");
     // Second order greeks
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.gamma(); }, price, vecSize, step,
-                          "_vibrato_digital_gamma_anti");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.vanna(); }, price, vecSize, step,
-                          "_vibrato_digital_vanna_anti");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.volga(); }, price, vecSize, step,
-                          "_vibrato_digital_volga_anti");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return ve.gamma(); }, price, vecSize, step,
+                                  "_vibrato_digital_gamma_anti");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return ve.vanna(); }, price, vecSize, step,
+                                  "_vibrato_digital_vanna_anti");
+    Helper<double>::generateGreek(&o, &bs, [&](void) -> double { return ve.volga(); }, price, vecSize, step,
+                                  "_vibrato_digital_volga_anti");
 
     std::cout << "***** Vibrato for digital options terminated!" << std::endl;
 

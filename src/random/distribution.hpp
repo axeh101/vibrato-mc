@@ -18,7 +18,7 @@ class Distribution {
     // We retrieve the type for it to be used elsewhere.
     using RT = T;
 private:
-    uniform_real_distribution<T> u_ = uniform_real_distribution<T>(0, 1.0);
+    uniform_real_distribution<double> u_ = uniform_real_distribution<double>(0, 1.0);
     std::mt19937_64 gen = MersenneTwister()();
 
 public:
@@ -33,7 +33,8 @@ public:
     virtual T cdf(T x) const = 0;
 
     virtual T operator()() {
-        return u_(gen);
+        T retval = u_(gen);
+        return retval;
     };
 
     virtual vector<T> &generate(int size) {

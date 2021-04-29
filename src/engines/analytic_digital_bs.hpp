@@ -28,7 +28,7 @@ public:
 
     virtual D delta() override {
         setParams();
-        return this->option_->type() * ract * pd2 / (sigma * sqrt(T) * S);
+        return this->option_->dtype() * ract * pd2 / (sigma * sqrt(T) * S);
     }
 
     virtual D rho() override {
@@ -39,18 +39,17 @@ public:
         } else {
             return -T * ract - crho;
         }
-
     }
 
     virtual D vega() override {
         setParams();
-        return -this->option_->type() * d1 * pd2 * ract / sigma;
+        return -this->option_->dtype() * d1 * pd2 * ract / sigma;
     }
 
 
     virtual D gamma() override {
         setParams();
-        return -this->option_->type() * ract * pd2 * d1 / (sigma * sigma * S * S * T);
+        return -this->option_->dtype() * ract * pd2 * d1 / (sigma * sigma * S * S * T);
     }
 
     virtual D theta() override {
@@ -66,12 +65,12 @@ public:
 
     virtual D vanna() override {
         setParams();
-        return this->option_->type() * ract * pd2 * (d1 * d2 - 1) / (S * sigma * sigma * sqrt(T));
+        return this->option_->dtype() * ract * pd2 * (d1 * d2 - 1) / (S * sigma * sigma * sqrt(T));
     }
 
     virtual D volga() override {
         setParams();
-        return -this->option_->type() * ract * pd2 * (d1 * d1 * d2 - d1 - d2) / (sigma * sigma);
+        return -this->option_->dtype() * ract * pd2 * (d1 * d1 * d2 - d1 - d2) / (sigma * sigma);
     }
 
 private:

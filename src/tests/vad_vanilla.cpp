@@ -2,6 +2,9 @@
 #include "../all.hpp"
 #include "helper.hpp"
 
+#include <autodiff/forward.hpp>
+
+using namespace autodiff;
 using namespace std;
 
 
@@ -9,56 +12,56 @@ int main() {
 
     std::cout << "***** Staring vibrato AD for vanilla options!" << std::endl;
 
-    double maturity = 1;
-    double strike = 100;
-    double price = 50;
+    dual maturity = 1;
+    dual strike = 100;
+    dual price = 50;
 
-    double rate = .05;
-    double vol = .2;
+    dual rate = .05;
+    dual vol = .2;
 
     int n = 25;
     int M = 50000;
     int Mz = 20;
 
     // Product definition
-    VanillaOption<double> o(maturity, strike, OptionType::Call);
+    VanillaOption<dual> o(maturity, strike, OptionType::Call);
 
     // Black Scholes process definition
-    State<double> initialState = {0.0, price};
-    BlackScholesProcess<double> bs(initialState, rate, vol);
+    State<dual> initialState = {0.0, price};
+    BlackScholesProcess<dual> bs(initialState, rate, vol);
 
     // Pricing engines definition
-    auto be = AnalyticalVanillaBS<double>(&o, &bs);
-    auto ve = VibratoAD<double>(&o, &bs, n, M, Mz);
+    auto be = AnalyticalVanillaBS<dual>(&o, &bs);
+    auto ve = VibratoAD<dual>(&o, &bs, n, M, Mz);
 
     size_t vecSize = 100;
     int step = 1;
 
     // Black Scholes
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.gamma(); }, price, vecSize, step,
-                          "_analytic_gamma");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.vanna(); }, price, vecSize, step,
-                          "_analytic_vanna");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return be.volga(); }, price, vecSize, step,
-                          "_analytic_volga");
+    Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return be.gamma(); }, price, vecSize, step,
+                                "_analytic_ad_gamma");
+    Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return be.vanna(); }, price, vecSize, step,
+                                "_analytic_ad_vanna");
+    Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return be.volga(); }, price, vecSize, step,
+                                "_analytic_ad_volga");
 
 
     ve.antithetic = false;
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.gamma(); }, price, vecSize, step,
-                          "_vibratoad_gamma");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.vanna(); }, price, vecSize, step,
-                          "_vibratoad_vanna");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.volga(); }, price, vecSize, step,
-                          "_vibratoad_volga");
+    Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return ve.gamma(); }, price, vecSize, step,
+                                "_vibrato_ad_gamma");
+    Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return ve.vanna(); }, price, vecSize, step,
+                                "_vibrato_ad_vanna");
+    Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return ve.volga(); }, price, vecSize, step,
+                                "_vibrato_ad_volga");
 
     // Antithetic outputs
     ve.antithetic = true;
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.gamma(); }, price, vecSize, step,
-                          "_vibratoad_gamma_anti");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.vanna(); }, price, vecSize, step,
-                          "_vibratoad_vanna_anti");
-    Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.volga(); }, price, vecSize, step,
-                          "_vibratoad_volga_anti");
+    Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return ve.gamma(); }, price, vecSize, step,
+                                "_vibrato_ad_gamma_anti");
+    Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return ve.vanna(); }, price, vecSize, step,
+                                "_vibrato_ad_vanna_anti");
+    Helper<dual>::generateGreek(&o, &bs, [&](void) -> dual { return ve.volga(); }, price, vecSize, step,
+                                "_vibrato_ad_volga_anti");
 
 
     std::cout << "***** Vibrato for vanilla options terminated!" << std::endl;

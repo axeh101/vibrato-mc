@@ -52,3 +52,6 @@ clean:
 
 setup:
 	mkdir -p $(BINDIR) src/python/datasets
+
+autodiff:
+	$(CC) -o $(BINDIR)/autodiff $(CFLAGS) $(TESTDIR)/autodiff.cpp

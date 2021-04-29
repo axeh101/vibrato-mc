@@ -41,7 +41,7 @@ public:
     }
 
 
-    virtual T eulerPriceDiff(double h) {
+    virtual T eulerPriceDiff(T h) {
         return Process<T>::eulerPriceDiff(h, normal());
     }
 

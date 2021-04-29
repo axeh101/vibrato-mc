@@ -14,12 +14,10 @@ public:
             Option<T>(maturity, strike, type, "Digital Option") {};
 
     T payoff(T price) const override {
-        return (this->type_ * (price - this->strike_) > 0.0);
+        T value = this->dtype() * (price - this->strike_);
+        return value > 0.0;
     }
 
-    dual payoff(dual price) const override {
-        return ((double) this->type_) * (price - this->strike_) > (dual) 0.;
-    }
 
 };
 

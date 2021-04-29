@@ -7,7 +7,7 @@
 
 template<typename T>
 struct State {
-    double time;
+    T time;
     T value;
 
     friend std::ostream &operator<<(std::ostream &o, State<T> const &s) {
