@@ -2,6 +2,7 @@
 #define VIBRATOAD_VANILLA_HPP
 
 #include <autodiff/forward.hpp>
+
 using namespace autodiff;
 
 
@@ -26,7 +27,7 @@ public:
         // Fonction permettant de calculer le delta dont on va calculer la dérivée par AD.
         // On utilise une expression lambda car la librairie ne supporte pas les méthodes
         // de classe
-        auto f =[&](auto x) {return this->_f_delta(x);};
+        auto f = [&](auto x) { return this->_f_delta(x); };
 
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
@@ -39,13 +40,13 @@ public:
             dual X = this->process_->priceState().value;
             total += derivative(f, wrt(X), at(X));
         }
-        return exp(-this->process_->rate() * T) * total / (M*Mz);
+        return exp(-this->process_->rate() * T) * total / (M * Mz);
     }
 
     D vanna() override {
         D total = 0;
         // Fonction permettant de calculer le vega dont on va calculer la dérivée pa rapport a X par AD.
-        auto f =[&](auto x, auto y) { return this->_f_vega(x, y); };
+        auto f = [&](auto x, auto y) { return this->_f_vega(x, y); };
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
             vegaTangentProcess.resetState();
@@ -58,13 +59,13 @@ public:
             dual X = this->process_->priceState().value;
             total += derivative(f, wrt(X), at(X, sigma));
         }
-        return exp(-this->process_->rate() * T) * total / (M*Mz);
+        return exp(-this->process_->rate() * T) * total / (M * Mz);
     }
 
     D volga() override {
         D total = 0;
         // Fonction permettant de calculer le vega dont on va calculer la dérivée pa rapport a sigma par AD.
-        auto f =[&](auto x, auto y) { return this->_f_vega(x, y); };
+        auto f = [&](auto x, auto y) { return this->_f_vega(x, y); };
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();
             vegaTangentProcess.resetState();
@@ -78,7 +79,7 @@ public:
             total += derivative(f, wrt(sigma), at(X, sigma));
         }
 
-        return exp(-this->process_->rate() * T) * total / (M*Mz);
+        return exp(-this->process_->rate() * T) * total / (M * Mz);
     }
 
     virtual ~VibratoAD() = default;

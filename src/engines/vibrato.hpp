@@ -171,7 +171,7 @@ public:
         return exp(-this->process_->rate() * T) * total / M;
     }
 
-    virtual D volga()  override{
+    virtual D volga() override {
         D total = 0.;
         for (int i = 0; i < M; ++i) {
             this->process_->resetState();

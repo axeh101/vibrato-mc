@@ -21,6 +21,7 @@ private:
         available_ = true;
         return m_ + sigma_ * R * sin(O);
     }
+
 public:
     NormalDistribution(T m, T sigma) : m_(m), sigma_(sigma) {};
 
@@ -41,7 +42,6 @@ public:
         }
         return rnorm_box_muller();
     }
-
 
 
 };

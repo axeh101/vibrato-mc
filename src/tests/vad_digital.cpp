@@ -1,6 +1,7 @@
 #include <iostream>
 #include "../all.hpp"
 #include "helper.hpp"
+
 using namespace std;
 
 
@@ -58,7 +59,6 @@ int main() {
                           "_vibrato_digital_ad_vanna_anti");
     Helper::generateGreek(&o, &bs, [&](void) -> double { return ve.volga(); }, price, vecSize, step,
                           "_vibrato_digital_ad_volga_anti");
-
 
 
     std::cout << "***** Vibrato AD for digital options terminated!" << std::endl;

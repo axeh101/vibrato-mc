@@ -50,7 +50,7 @@ public:
 
     virtual D gamma() override {
         setParams();
-        return -this->option_->type() * ract * pd2 * d1  / (sigma * sigma * S * S * T);
+        return -this->option_->type() * ract * pd2 * d1 / (sigma * sigma * S * S * T);
     }
 
     virtual D theta() override {

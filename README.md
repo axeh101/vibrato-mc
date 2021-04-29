@@ -78,10 +78,8 @@ make all
 4. pour les sorties des mesure de performances:
 
     - Executer ```make perf``` puis `bin/./vibrato-perf`
-   
 
 # Exemple de sortie du programme de calcul :
-
 
                               **************** Pricing results ****************
                               *************************************************

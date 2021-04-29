@@ -17,8 +17,8 @@ public:
     };
 
     dual payoff(dual price) const override {
-        dual value = (dual)this->type_ * (price - this->strike_);
-        return ( value> (dual)0.) ? value : (dual) 0.;
+        dual value = (dual) this->type_ * (price - this->strike_);
+        return (value > (dual) 0.) ? value : (dual) 0.;
     }
 };
 

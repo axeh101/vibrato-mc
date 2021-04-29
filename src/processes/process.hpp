@@ -34,7 +34,6 @@ public:
     }
 
 
-
     virtual State<T> movePriceEuler(double h, T Z) {
         this->priceState_ = this->nextPriceEuler(h, Z);
         return this->priceState_;
