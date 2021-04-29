@@ -22,7 +22,7 @@ public:
         h = T / n;
     }
 
-    D gamma() {
+    D gamma() override{
         D total = 0;
         // Fonction permettant de calculer le delta dont on va calculer la dérivée par AD.
         // On utilise une expression lambda car la librairie ne supporte pas les méthodes

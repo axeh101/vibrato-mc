@@ -1,4 +1,4 @@
-#ifndef ANALYTIC_iDIGITAL_BS_HPP
+#ifndef ANALYTIC_DIGITAL_BS_HPP
 #define ANALYTIC_DIGITAL_BS_HPP
 
 #include <cmath>
