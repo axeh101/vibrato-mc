@@ -58,9 +58,9 @@ public:
         D ctheta = ract * nd2 * r;
         ctheta += ract * pd2 * (d1 / (2 * T) - r / (sigma * sqrt(T)));
         if (this->option_->type() == OptionType::Call) {
-            return ctheta;
+            return -ctheta;
         } else {
-            return r * ract - ctheta;
+            return ctheta - r * ract;
         }
     }
 
