@@ -20,10 +20,6 @@ public:
 
     virtual T diffusion() const = 0;
 
-    virtual T eulerPriceDiff(double h, T Z) {
-        return this->drift() * h + this->diffusion() * sqrt(h) * Z;
-    }
-
     virtual Path<T> eulerDiscretization(int nsamples, double horizon) {
         NormalDistribution<T> N = NormalDistribution<T>(0, 1);
         resetState();
@@ -37,6 +33,13 @@ public:
 
     }
 
+
+
+    virtual State<T> movePriceEuler(double h, T Z) {
+        this->priceState_ = this->nextPriceEuler(h, Z);
+        return this->priceState_;
+    }
+
     virtual State<T> nextPriceEuler(double h, T Z) {
         return {
                 priceState_.time + h,
@@ -44,9 +47,8 @@ public:
         };
     }
 
-    virtual State<T> movePriceEuler(double h, T Z) {
-        this->priceState_ = this->nextPriceEuler(h, Z);
-        return this->priceState_;
+    virtual T eulerPriceDiff(double h, T Z) {
+        return this->drift() * h + this->diffusion() * sqrt(h) * Z;
     }
 
     virtual void resetState() {
