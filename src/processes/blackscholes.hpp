@@ -10,7 +10,7 @@
 
 template<typename T>
 class BlackScholesProcess : public Process<T> {
-
+    using Process<T>::eulerPriceDiff;
 public:
     BlackScholesProcess(State<T> initialState, T rate, T vol) :
             Process<T>(initialState, "Black-Scholes") {

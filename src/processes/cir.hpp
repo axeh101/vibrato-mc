@@ -7,6 +7,8 @@
 
 template<typename T>
 class CoxIngersollRossProcess : public Process<T> {
+
+    using Process<T>::eulerPriceDiff;
 private:
 
     T eta_;

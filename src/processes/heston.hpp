@@ -6,7 +6,7 @@
 
 template<typename T>
 class HestonProcess : public Process<T> {
-
+    using Process<T>::eulerPriceDiff;
 private:
 
     NormalDistribution<T> normal = NormalDistribution<T>(0, 1);
@@ -83,12 +83,12 @@ public:
         return -this->priceState_.value / (4 * v * v * v);
     }
 
-    virtual void resetState() {
+    virtual void resetState() override{
         volProcess_->resetState();
         Process<T>::resetState();
     }
 
-    virtual std::ostream &describe(std::ostream &o) const {
+    virtual std::ostream &describe(std::ostream &o) const override{
         return Process<T>::describe(o) <<
                                        "Rate: " << this->rate_ << std::endl <<
                                        "Volatility: " << *this->volProcess_ << std::endl <<
